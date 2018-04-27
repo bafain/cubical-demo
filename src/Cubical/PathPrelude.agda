@@ -23,6 +23,9 @@ module _ {ℓ} {A : Set ℓ} where
   trans {x = x} p q i = primComp (λ _ → A) _ (λ { j (i = i0) → x
                                                 ; j (i = i1) → q j }) (p i)
 
+  infixl 5 _◾_
+  _◾_ = trans
+
   -- Dependent version of the above.
   cong-d : ∀ {ℓ'} {B : A → Set ℓ'} {x y : A}
     → (f : (a : A) → B a) → (p : PathP (λ _ → A) x y)

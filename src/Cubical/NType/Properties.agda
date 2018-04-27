@@ -73,10 +73,6 @@ module _ {ℓ : Level} {A B : Set ℓ} where
     fromRetract r = r
 
 private
-  infixl 5 _◾_
-  _◾_ = trans
-
-private
   module _ {ℓ : Level} {A : Set ℓ} {a b c : A} {p : a ≡ b} {q : b ≡ c} where
     helper : {r : a ≡ c} → p ◾ q ≡ r → q ≡ sym p ◾ r
     helper {r} = pathJ (\ b p → (q : b ≡ c) → p ◾ q ≡ r → q ≡ sym p ◾ r) (\ q eq →
