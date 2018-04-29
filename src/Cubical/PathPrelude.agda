@@ -160,6 +160,11 @@ module _ {ℓa ℓb} {A : Set ℓa} {B : A → Set ℓb} where
   funUnImp : ({x : A} → B x) → (x : A) → B x
   funUnImp f x = f {x}
 
+  -- Definition 2.4.1
+  module _ (f g : (a : A) → B a) where
+    Homotopy : Set (ℓ-max ℓa ℓb)
+    Homotopy = ∀ a → f a ≡ g a
+
   funExt : {f g : (x : A) → B x} → ((x : A) → f x ≡ g x) → f ≡ g
   funExt p = λ i x → p x i
 
