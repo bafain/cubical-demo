@@ -45,6 +45,7 @@ lemSigP {B = B} pB u v p i = (p i) , lemPropF (pB i) p {b0 = fill (\ j → B j (
                                                        {b1 = fill (\ j → B (~ j) (fst v)) i0 (\ _ → empty) (snd v) (~ i)} i
 
 module _ {ℓ} {A : Set ℓ} where
+  -- Lemma 3.3.4
   propSet : isProp A → isSet A
   propSet h = λ(a b : A) (p q : a ≡ b) j i →
     primComp (λ k → A)((~ i ∨ i) ∨ (~ j ∨ j))
@@ -59,6 +60,10 @@ module _ {ℓ} {A : Set ℓ} where
   hasLevelPath ⟨-2⟩      lvl x y = lvl x y , propSet lvl x y (lvl x y)
   hasLevelPath (S ⟨-2⟩)  lvl = lvl
   hasLevelPath (S (S n)) lvl = lvl
+
+  -- Lemma 3.11.10 "only if"
+  lem3-11-10-> : isProp A → ∀ (x y : A) → isContr (x ≡ y)
+  lem3-11-10-> pA x y = lemContr' (propSet pA x y) (pA x y)
 
 module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'}  where
   propIsEquiv : (f : A → B) → isProp (isEquiv A B f)
