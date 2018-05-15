@@ -90,13 +90,13 @@ module _ {ℓ} {A : Set ℓ} where
   singl : (a : A) → Set ℓ
   singl a = Σ[ x ∈ A ] (a ≡ x)
 
-  contrSingl : {a b : A} (p : a ≡ b) → _≡_ {A = singl a} (a , refl) (b , p)
-  contrSingl p = λ i → ((p i) , λ j → p (i ∧ j))
+  contrSingl : ∀ {a} → isContr (singl a)
+  contrSingl {a} = (a , refl) , λ { (_ , p) → λ i → ((p i) , λ j → p (i ∧ j)) }
 
 module _ {ℓ ℓ'} {A : Set ℓ} {x : A}
          (P : ∀ y → x ≡ y → Set ℓ') (d : P x ((λ i → x))) where
   pathJ : (y : A) → (p : x ≡ y) → P y p
-  pathJ _ p = transp (λ i → uncurry P (contrSingl p i)) d
+  pathJ y p = transp (λ i → uncurry P (snd contrSingl (y , p) i)) d
 
   pathJprop : pathJ _ refl ≡ d
   pathJprop i = primComp (λ _ → P x refl) i (λ {j (i = i1) → d}) d
@@ -135,7 +135,7 @@ transpP {B = B} p = pathJ (λ y _ → B _ → B y) (λ x → x) _ p
 
 module _ {ℓ ℓ' : Level} {A : Set ℓ} {B : A → Set ℓ'} {x y : A} (p : x ≡ y) where
   transpP≡subst : transpP {B = B} p ≡ subst {P = B} p
-  transpP≡subst = sym (transp-pi (λ j → uncurry (λ (y : A) → λ _ → B y) (contrSingl p j)) (λ x → x))
+  transpP≡subst = sym (transp-pi (λ j → uncurry (λ (y : A) → λ _ → B y) (snd contrSingl (y , p) j)) (λ x → x))
 
   transpP≡subst' : {b : B x} → transpP {B = B} p b ≡ subst {P = B} p b
   transpP≡subst' {b} i = transpP≡subst i b
@@ -235,7 +235,7 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} where
   inverse (_ , eqv) b = fst (fst (eqv b))
 
 idEquiv : ∀ {ℓ} → {A : Set ℓ} → A ≃ A
-idEquiv {A = A} = idFun A , (λ y → (y , refl) , contrSingl ∘ snd)
+idEquiv {A = A} = idFun A , (λ y → (y , refl) , snd contrSingl)
 
 -- Definition 4.6.1
 module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} (f : A → B) where

@@ -73,6 +73,10 @@ module _ {ℓa ℓb : _} {A : Set ℓa} {B : Set ℓb} where
     lem3-3-3 : isEquiv _ _ f
     lem3-3-3 = λ y → contrSig (lemContr' propA (g y)) (λ x → lem3-11-10-> propB y (f x))
 
+  module _ (contrA : isContr A) (contrB : isContr B) {f : A → B} where
+    contrEquiv : isEquiv _ _ f
+    contrEquiv = lem3-3-3 (contrIsProp contrA) (contrIsProp contrB) f (λ _ → fst contrA)
+
 module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'}  where
   propIsEquiv : (f : A → B) → isProp (isEquiv A B f)
   propIsEquiv f = λ u0 u1 → λ i → λ y → propIsContr (u0 y) (u1 y) i
