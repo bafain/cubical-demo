@@ -1,28 +1,52 @@
-{-# OPTIONS --cubical --caching #-}
-module Cubical.Quotient where
+-- The graph quotient colim(Γ) (Definition 1.2 in Rijke17) of
+-- a graph Γ = (Γ₀,Γ₁) (Definition 1.1 in Rijke17) is the coequalizer
+-- of the two projections
+--
+--   src : ΣΓ₁ → Γ₀  and  tgt : ΣΓ₁ → Γ₀
+--
+-- (Remark 1.3 in Rijke17), where ΣΓ₁ = Σ (i,j : Γ₀) Γ₁(i,j).
+module Cubical.Quotient {ℓ}
+                        (Γ₀ : Set ℓ)
+                        (Γ₁ : Γ₀ → Γ₀ → Set ℓ) where
 
-
-open import Cubical.PushOut
-open import Cubical.FromStdLib
 open import Cubical.PathPrelude
-open import Cubical.Lemmas
+open import Cubical.FromStdLib
 open import Cubical.CoEqualizer
 
-module TheQuot {l} (A : Set l) (R : A → A → Set l) (R-refl : ∀ x → R x x) where
+private
+  ΣΓ₁ : Set ℓ
+  ΣΓ₁ = Σ Γ₀ (λ i → Σ Γ₀ (λ j → Γ₁ i j))
 
-  module QQ = TheCoEq (Σ A \ x → Σ A \ y → R x y) A (\ z → z .fst) (\ x → x .snd .fst)
-  open QQ renaming (CoEq to Quot; coeq to quot)
+  src : ΣΓ₁ → Γ₀
+  src = fst
 
-  quot-path : ∀ {x y} → R x y → quot x ≡ quot y
-  quot-path r = coeq-path (_ , _ , r)
+  tgt : ΣΓ₁ → Γ₀
+  tgt = fst ∘ snd
 
-  module _ {p} (P : Quot → Set p) (f : (x : A) → P (quot x))
-                ([f] : ∀ x y → (r : R x y) → PathP (\ i → P (quot-path r i)) (f x) (f y))
-                where
+open TheCoEq _ _ src tgt
 
-    quot-elim : ∀ x → P x
-    quot-elim = Elim.coeq-elim {C = P} f (\ { (x , y , r) → [f] x y r })
+-- colim(Γ)
+quot : Set ℓ
+quot = CoEq
 
+constr₀ : Γ₀ → quot
+constr₀ = coeq
 
-    quot-elim-path : ∀ x y (r : R x y) → (\ i → quot-elim (quot-path r i)) ≡ [f] x y r
-    quot-elim-path x y r = Elim.coeq-elim-path {C = P} f ((\ { (x , y , r) → [f] x y r })) (x , y , r)
+[_] = constr₀
+
+constr₁ : ∀ {i j} (i~j : Γ₁ i j) → [ i ] ≡ [ j ]
+constr₁ i~j = coeq-path (_ , _ , i~j)
+
+module _ {T : quot → Set ℓ}
+         (f : ∀ i → T [ i ])
+         (well-defined : ∀ {i j} (i~j : Γ₁ i j) → PathP (λ x → T (constr₁ i~j x)) (f i) (f j)) where
+  open Elim {C = T} f (λ { (i , j , i~j) → well-defined i~j })
+
+  elim : ∀ [i] → T [i]
+  elim = coeq-elim
+
+  elim-β₀ : ∀ i → elim [ i ] ≡ f i
+  elim-β₀ i = coeq-elim-beta i
+
+  elim-β₁ : ∀ {i j} (i~j : Γ₁ i j) → cong-d elim (constr₁ i~j) ≡ well-defined i~j
+  elim-β₁ i~j = coeq-elim-path (_ , _ , i~j)
