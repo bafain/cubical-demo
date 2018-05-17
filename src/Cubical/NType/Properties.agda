@@ -60,11 +60,6 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'}  where
 
 open import Cubical.Retract
 
-module _ {ℓa ℓb : Level} {A : Set ℓa} {B : A → Set ℓb} where
-  module _ (f g : (a : A) → B a) where
-    Homotopy : Set (ℓ-max ℓa ℓb)
-    Homotopy = ∀ a → f a ≡ g a
-
 module _ {ℓ : Level} {A B : Set ℓ} where
   module _ {f g : A → A} where
     -- Just as a reminder: A retract of f and g is a homotopy between their
