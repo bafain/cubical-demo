@@ -22,3 +22,4 @@ open import Cubical.Sub
 open import Cubical.Id
 
 open import Cubical.Quotient
+open import Cubical.SeqColimit
