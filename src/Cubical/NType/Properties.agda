@@ -9,6 +9,12 @@ open import Cubical.Lemmas
 lemProp : ∀ {ℓ} {A : Set ℓ} → (A → isProp A) → isProp A
 lemProp h = λ a → h a a
 
+-- Lemma 3.11.3 (ii) -> (i)
+lemContr' : ∀ {ℓ} {A : Set ℓ} (pA : isProp A) (a : A) → isContr A
+lemContr' {ℓ} {A} pA a = (a , rem)
+  where rem : (y : A) → Path a y
+        rem y = pA a y
+
 module _ {ℓ ℓ'} {A : Set ℓ} {B : A → Set ℓ'} where
   -- Π preserves propositionality in the following sense:
   propPi : (h : (x : A) → isProp (B x)) → isProp ((x : A) → B x)

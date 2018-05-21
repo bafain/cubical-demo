@@ -177,11 +177,6 @@ groupoidSig {ℓ} {ℓ'} {A} {B} gA gB t u = substInv {A = Set (ℓ-max ℓ ℓ'
   rem3 : Path (Path t u) (Σ T (λ p → C p))
   rem3 = lemPathSig t u
 
-lemContr' : ∀ {ℓ} {A : Set ℓ} (pA : isProp A) (a : A) → isContr A
-lemContr' {ℓ} {A} pA a = (a , rem)
-  where rem : (y : A) → Path a y
-        rem y = pA a y
-
 lem3  : ∀ {ℓ ℓ'} {A : Set ℓ} {B : A → Set ℓ'} (pB : (x : A) → isProp (B x))
   (t u : Σ A B) (p : Path (t .fst) (u .fst)) →
   isContr (PathP (λ i → B (p i)) (t .snd) (u .snd))
