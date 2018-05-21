@@ -26,3 +26,4 @@ open import Cubical.SeqColimit
 open import Cubical.PushOut
 open import Cubical.PushOut.Properties
 open import Cubical.Equivalence.Properties
+open import Cubical.Embedding.Properties
