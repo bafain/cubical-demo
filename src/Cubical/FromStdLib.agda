@@ -12,13 +12,19 @@ open import Agda.Builtin.Nat public
   using (zero; suc; _+_; _*_)
   renaming (Nat to ℕ)
 
-data ⊥ : Set where
+record ⊤ {ℓ} : Set ℓ where
+  constructor tt
 
-⊥-elim : ∀ {l} {A : Set l} → ⊥ → A
+⊤-intro : ∀ {l} {A : Set l} → A → ⊤ {l}
+⊤-intro _ = tt
+
+data ⊥ {ℓ} : Set ℓ where
+
+⊥-elim : ∀ {l} {A : Set l} → ⊥ {l} → A
 ⊥-elim ()
 
 ¬_ : ∀ {l} → Set l → Set l
-¬ A = A → ⊥
+¬_ {l} A = A → ⊥ {l}
 
 open import Agda.Builtin.Bool public
 
