@@ -1,6 +1,7 @@
 {-# OPTIONS --cubical #-}
 module Cubical.Lemmas where
 
+open import Cubical.FromStdLib
 open import Cubical.PathPrelude
 open import Cubical.Comp
 
@@ -38,3 +39,7 @@ module _ {ℓa ℓb : _} {A : Set ℓa} {B : Set ℓb} where
     lem2-4-3 : trans (H x) (cong g p) ≡ trans (cong f p) (H y)
     lem2-4-3 = pathJ (λ y p → trans (H x) (cong g p) ≡ trans (cong f p) (H y))
                      (trans (trans-id (H x)) (sym (trans-id-l (H x)))) y p
+
+module _ {ℓa ℓb : _} {A : Set ℓa} {B : A → Set ℓb} where
+  FUNEXT : {f g : (x : A) → B x} → (f ≡ g) ≃ ((x : A) → f x ≡ g x)
+  FUNEXT = happly , λ f~g → (funExt f~g , refl) , λ fibf~g i → funExt (snd fibf~g i) , λ j → snd fibf~g (i ∧ j)
