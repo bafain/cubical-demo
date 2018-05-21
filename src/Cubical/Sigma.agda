@@ -312,3 +312,31 @@ sigPresNType {ℓb = ℓb} {A = A} {B} {S (S n)} ntA a→ntB (a₁ , b₁) (a₂
 module _ {ℓa ℓb : Level} {A : Set ℓa} {B : A → Set ℓb} where
   sigPresSet : isSet A → (∀ a → isSet (B a)) → isSet (Σ A B)
   sigPresSet = sigPresNType {n = S (S ⟨-2⟩)}
+
+-- Exercise 2.10 (Σ-types are associative)
+module _ {ℓa ℓb ℓc} {A : Set ℓa} {B : A → Set ℓb} {C : Σ A B → Set ℓc} where
+  ex2-10 : Σ A (λ a → Σ (B a) λ b → C (a , b)) ≃ Σ (Σ A B) C
+  ex2-10 = to , λ { ((a , b) , c) → (_ , refl) , λ { (_ , p) i → from (p i) , λ j → p (i ∧ j) }}
+    where
+      to : Σ A (λ a → Σ (B a) λ b → C (a , b)) → Σ (Σ A B) C
+      to (a , b , c) = (a , b) , c
+
+      from : Σ (Σ A B) C → Σ A (λ a → Σ (B a) λ b → C (a , b))
+      from ((a , b) , c) = a , b , c
+
+  Σ-assoc = ex2-10
+
+-- ×-types are commutative (and associative)
+module _ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} where
+  ×-comm : (A × B) ≃ (B × A)
+  ×-comm = to , λ { (a , b) → (_ , refl) , λ { (_ , p) i → from (p i) , λ j → p (i ∧ j) }}
+    where
+      to : A × B → B × A
+      to (a , b) = b , a
+
+      from : B × A → A × B
+      from (b , a) = a , b
+
+  module _ {ℓc} {C : Set ℓc} where
+    ×-assoc : (A × B × C) ≃ ((A × B) × C)
+    ×-assoc = Σ-assoc
