@@ -25,3 +25,11 @@ primitive
                     → (il : ∀ a → M (inl a)) (ir : ∀ b → M (inr b))
                     → (p : ∀ c → PathP (\ i → M (push c i)) (il (f c)) (ir (g c)))
                     → ∀ x → M x
+
+module _ {ℓ} {A B C : Set ℓ} (f : C → A) (g : C → B) where
+  -- Definition 6.8.1
+  record _-cocone (D : Set ℓ) : Set ℓ where
+    field
+      i : A → D
+      j : B → D
+      h : Homotopy (i ∘ f) (j ∘ g)
