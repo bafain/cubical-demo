@@ -3,6 +3,7 @@ module Cubical.Fiberwise where
 
 open import Cubical.PathPrelude
 open import Cubical.FromStdLib
+open import Cubical.Equivalence.Properties
 open import Cubical.NType
 open import Cubical.NType.Properties
 open import Cubical.Lemmas
@@ -53,3 +54,15 @@ module ContrToUniv {ℓ : Level} {U : Set ℓ} {ℓr} (_~_ : U → U → Set ℓ
                   (λ y → sigPresContr ((_ , refl) , (\ z → snd contrSingl z))
                                       \ a → hasLevelPath ⟨-2⟩ (HasLevel+1 ⟨-2⟩ (c A)) _ _)
                   B
+
+module _ {ℓa ℓb : _} {A : Set ℓa} {B : A → Set ℓb} where
+  lem4-8-1 : ∀ a → fiber (fst {B = B}) a ≃ B a
+  lem4-8-1 a =   fiber fst a
+               ≃⟨ inverseEquiv Σ-assoc ⟩
+                 Σ A (λ x → Σ (B x) λ _ → a ≡ x)
+               ≃⟨ _ , totalEquiv _ _ _ (λ x → ×-comm .snd) ⟩
+                 Σ A (λ x → Σ (a ≡ x) λ _ → B x)
+               ≃⟨ Σ-assoc ⟩
+                 Σ (Σ A λ x → a ≡ x) (λ xp → B (xp .fst))
+               ≃⟨ lem3-11-9-ii _ _ contrSingl ⟩
+                 B a □
