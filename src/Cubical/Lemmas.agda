@@ -44,6 +44,10 @@ module _ {ℓ} {A : Set ℓ} where
                                   (~ i)
     --              = trans-inv-r (sym p)
 
+    -- (iii)
+    inv-involution : sym (sym p) ≡ p
+    inv-involution = refl
+
   module _ {x y z a : A} {p : x ≡ y} {q : y ≡ z} {r : z ≡ a} where
     -- (iv)
     trans-assoc : (trans p (trans q r)) ≡ trans (trans p q) r
