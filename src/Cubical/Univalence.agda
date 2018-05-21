@@ -21,7 +21,7 @@ open _≃_
 
 idEquiv : ∀ {ℓ} {A : Set ℓ} → A ≃ A
 idEquiv .eqv = idFun _
-idEquiv .isEqv = (λ y → (y , refl) , contrSingl ∘ snd)
+idEquiv .isEqv = (λ y → contrSingl)
 
 
 idtoeqv : ∀ {ℓ} {A B : Set ℓ} → A ≡ B → A ≃ B

@@ -50,6 +50,6 @@ module ContrToUniv {ℓ : Level} {U : Set ℓ} {ℓr} (_~_ : U → U → Set ℓ
 
   lemma : ∀ {A B} → isEquiv _ _ (idTo~ {A} {B})
   lemma {A} {B} = fiberEquiv (λ z → A ≡ z) (λ z → A ~ z) (\ B → idTo~ {A} {B})
-                  (λ y → sigPresContr ((_ , refl) , (\ z → contrSingl (z .snd)))
+                  (λ y → sigPresContr ((_ , refl) , (\ z → snd contrSingl z))
                                       \ a → hasLevelPath ⟨-2⟩ (HasLevel+1 ⟨-2⟩ (c A)) _ _)
                   B
