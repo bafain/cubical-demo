@@ -242,6 +242,16 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} where
 idEquiv : ∀ {ℓ} → {A : Set ℓ} → A ≃ A
 idEquiv {A = A} = idFun A , (λ y → (y , refl) , contrSingl ∘ snd)
 
+-- Definition 4.6.1
+module _ {ℓ ℓ'} (A : Set ℓ) (B : Set ℓ') where
+  module _ (f : A → B) where
+    -- (ii)
+    isEmbedding : Set (ℓ-max ℓ ℓ')
+    isEmbedding = (x y : A) → isEquiv (x ≡ y) (f x ≡ f y) (cong f)
+
+  Embedding : Set (ℓ-max ℓ ℓ')
+  Embedding = Σ (A → B) isEmbedding
+
 module _ {ℓ : I → Level} (P : (i : I) → Set (ℓ i)) where
   private
     E : (i : I) → Set (ℓ i)
