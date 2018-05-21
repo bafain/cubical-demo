@@ -162,6 +162,9 @@ module _ {ℓa ℓb} {A : Set ℓa} {B : A → Set ℓb} where
     Homotopy : Set (ℓ-max ℓa ℓb)
     Homotopy = ∀ a → f a ≡ g a
 
+  happly : {f g : (x : A) → B x} → f ≡ g → ((x : A) → f x ≡ g x)
+  happly f≡g x = λ i → f≡g i x
+
   funExt : {f g : (x : A) → B x} → ((x : A) → f x ≡ g x) → f ≡ g
   funExt p = λ i x → p x i
 
