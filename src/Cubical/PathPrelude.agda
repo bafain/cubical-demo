@@ -6,6 +6,16 @@ open import Cubical.Primitives public using () renaming (Sub to _[_↦_])
 open import Cubical.FromStdLib
 open import Cubical.NType public using (isContr ; isProp ; isSet)
 
+module _ {ℓ} {A : I → Set ℓ} {x : A i0} {y : A i1} where
+  module _ {φ : I} {z : A i1 [ φ ↦ (λ _ → y) ]} where
+    trans-φ : (p : PathP A x y) → (y ≡ ouc z) [ φ ↦ (λ { (φ = i1) → λ _ → y }) ] → PathP A x (ouc z) -- [ φ ↦ (λ { (φ = i1) → p }) ]
+    trans-φ p q i = primComp (λ _ → A i)
+                             _
+                             (λ { _ (i = i0) → x
+                                ; j (i = i1) → ouc q j
+                                ; _ (φ = i1) → p i     })
+                             (p i)
+
 module _ {ℓ} {A : Set ℓ} where
   refl : {x : A} → x ≡ x
   refl {x = x} = λ _ → x
