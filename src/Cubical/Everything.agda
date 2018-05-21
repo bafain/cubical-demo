@@ -23,8 +23,10 @@ open import Cubical.Id
 
 open import Cubical.Quotient
 open import Cubical.SeqColimit
+open import Cubical.PullBack
 open import Cubical.PushOut
 open import Cubical.PushOut.Properties
+open import Cubical.Join
 open import Cubical.Equivalence.Properties
 open import Cubical.Equivalence.HAE
 open import Cubical.Equivalence.Embedding

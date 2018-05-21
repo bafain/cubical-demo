@@ -228,6 +228,13 @@ module _ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} {f : A → B} where
     hinv : Homotopy f g → Homotopy g f
     hinv H = λ a → sym (H a)
 
+    module _  {ℓc} {C : Set ℓc} where
+      left-whisker : ∀ (h : B → C) → Homotopy f g → Homotopy (h ∘ f) (h ∘ g)
+      left-whisker h f∼g = λ a → cong h (f∼g a)
+
+      right-whisker : ∀ (h : C → A) → Homotopy f g → Homotopy (f ∘ h) (g ∘ h)
+      right-whisker h f∼g = λ c → f∼g (h c)
+
     module _ {h : A → B} where
       infixl 5 _·_
       _·_ : Homotopy f g → Homotopy g h → Homotopy f h
