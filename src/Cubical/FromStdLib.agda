@@ -52,6 +52,9 @@ uncurry f (x , y) = f x y
 _×_ : ∀ {a b} (A : Set a) (B : Set b) → Set (ℓ-max a b)
 A × B = Σ[ x ∈ A ] B
 
+_×₁_ : ∀ {a b c d} {A : Set a} {B : Set b} {C : Set c} {D : Set d} (f : A → C) (g : B → D) → A × B → C × D
+(f ×₁ g) (a , b) = (f a , g b)
+
 flip : ∀ {a b c} {A : Set a} {B : Set b} {C : A → B → Set c} →
        ((x : A) (y : B) → C x y) → ((y : B) (x : A) → C x y)
 flip f = λ y x → f x y

@@ -23,3 +23,5 @@ open import Cubical.Id
 
 open import Cubical.Quotient
 open import Cubical.SeqColimit
+open import Cubical.PushOut
+open import Cubical.PushOut.Properties
