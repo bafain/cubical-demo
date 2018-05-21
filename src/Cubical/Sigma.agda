@@ -197,19 +197,47 @@ lem3 {ℓ} {ℓ'} {A} {B} pB t u p =
   rem2 : T0
   rem2 = transp (λ i → rem (~ i)) (pB (u .fst) v2 (u .snd))
 
-lem6 : ∀ {ℓ} (A : Set ℓ) (P : A → Set ℓ) (cA : (x : A) → isContr (P x)) →
-  Path {A = Set ℓ} (Σ A ( λ x → P x)) A
-lem6 {ℓ} A P cA = isoToPath f g t s where
-  T : Set ℓ
-  T = Σ A (λ x → P x)
-  f : T → A
-  f z  = z .fst
-  g : A →  T
-  g x = (x , ((cA x) .fst))
-  s : (z : T) → Path (g (f z)) z
-  s z = λ i → ((z .fst) , (((cA (z .fst)) .snd) (z .snd))  i)
-  t : (x : A) →  Path (f (g x)) x
-  t x = refl
+-- Lemma 3.11.9 (i)
+module _ {ℓ} (A : Set ℓ) (P : A → Set ℓ) (cA : (x : A) → isContr (P x)) where
+  private
+    T : Set ℓ
+    T = Σ A (λ x → P x)
+    f : T → A
+    f z  = z .fst
+    g : A →  T
+    g x = (x , ((cA x) .fst))
+    s : (z : T) → Path (g (f z)) z
+    s z = λ i → ((z .fst) , (((cA (z .fst)) .snd) (z .snd))  i)
+    t : (x : A) →  Path (f (g x)) x
+    t x = refl
+
+  lem3-11-9-i : Σ A P ≃ A
+  lem3-11-9-i = f , (gradLemma f g t s)
+
+  lem6 : Path {A = Set ℓ} (Σ A ( λ x → P x)) A
+  lem6 = isoToPath f g t s
+
+-- (ii) (also Exercise 3.20)
+module _ {ℓ ℓ'} (A : Set ℓ) (P : A → Set ℓ') (cA : isContr A)
+  (let a = cA .fst)
+  where
+
+  lem3-11-9-ii : Σ A P ≃ P a
+  lem3-11-9-ii = to , gradLemma to from to∘from from∘to
+    where
+      to : Σ A P → P a
+      to (a' , p) = subst (sym (cA .snd a')) p
+
+      from : P a → Σ A P
+      from p = a , p
+
+      from∘to : ∀ x → from (to x) ≡ x
+      from∘to (a' , p) i = cA .snd a' i , fill (λ i → P (sym (cA .snd a') i)) i0 (λ _ → empty) p (~ i)
+
+      to∘from : ∀ x → to (from x) ≡ x
+      to∘from p i = primComp (λ j → P (propSet (contrIsProp cA) a a (sym (cA .snd a)) refl i j)) _ (λ { j (i = i1) → p }) p
+
+  ex3-20 = lem3-11-9-ii
 
 lemSigProp : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} {pB : (x : A) →
   isProp (B x)} (t u : Σ A B) → Path (Path t u) (Path (t .fst) (u .fst))
