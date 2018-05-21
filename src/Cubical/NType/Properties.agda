@@ -38,6 +38,9 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : A → Set ℓ'} where
   propSig : (pA : isProp A) (pB : (x : A) → isProp (B x)) → isProp (Σ A B)
   propSig pA pB t u = lemSig pB t u (pA (fst t) (fst u))
 
+  contrSig : (cA : isContr A) (cB : (x : A) → isContr (B x)) → isContr (Σ A B)
+  contrSig cA cB = lemContr' (propSig (contrIsProp cA) (λ x → contrIsProp (cB x))) (fst cA , fst (cB _))
+
 lemSigP : ∀ {ℓ ℓ'} {A : Set ℓ} {B : (i : I) → A → Set ℓ'}
         (pB : ∀ i → (x : A) → isProp (B i x))
         (u : Σ A (B i0)) (v : Σ A (B i1)) (p : (fst u) ≡ (fst v)) → PathP (\ i → Σ A (B i)) u v
