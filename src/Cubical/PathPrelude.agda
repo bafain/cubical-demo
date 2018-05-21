@@ -242,6 +242,7 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} where
   inverse : A ≃ B → B → A
   inverse (_ , eqv) b = fst (fst (eqv b))
 
+-- Lemma 2.4.12 (i)
 idEquiv : ∀ {ℓ} → {A : Set ℓ} → A ≃ A
 idEquiv {A = A} = idFun A , (λ y → (y , refl) , contrSingl ∘ snd)
 
