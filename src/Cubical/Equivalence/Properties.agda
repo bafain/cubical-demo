@@ -66,3 +66,52 @@ _ ≃⟨ A≃B ⟩ B≃C = compEquiv A≃B B≃C
 _≃-qed _□ : ∀ {ℓ} (A : Set ℓ) → A ≃ A
 _ ≃-qed  = idEquiv
 _□ = _≃-qed
+
+module _ {ℓ} {A B C : Set ℓ} (f : A → B) (g : B → C) where
+  module _ (equivgf : isEquiv _ _ (g ∘ f)) where
+    private
+      gf⁻¹ : C → A
+      gf⁻¹ = inverse (_ , equivgf)
+
+      to : isEquiv _ _ f → isEquiv _ _ g
+      to equivf = gradLemma _ (f ∘ gf⁻¹) (inverse-section equivgf) fgf⁻¹g~id
+        where
+          f⁻¹ : B → A
+          f⁻¹ = inverse (_ , equivf)
+
+          fgf⁻¹g~id : Homotopy (f ∘ gf⁻¹ ∘ g) (idFun _)
+          fgf⁻¹g~id b =   f (gf⁻¹ (g b))
+                        ≡⟨ cong (f ∘ gf⁻¹ ∘ g) (sym (inverse-section equivf _)) ⟩
+                          f (gf⁻¹ (g (f (f⁻¹ b))))
+                        ≡⟨ cong f (inverse-retraction equivgf _) ⟩
+                          f (f⁻¹ b)
+                        ≡⟨ inverse-section equivf _ ⟩
+                          b ∎
+
+      from : isEquiv _ _ g → isEquiv _ _ f
+      from equivg = gradLemma _ (gf⁻¹ ∘ g) fgf⁻¹g~id (inverse-retraction equivgf)
+        where
+          g⁻¹ : C → B
+          g⁻¹ = inverse (_ , equivg)
+
+          fgf⁻¹g~id : Homotopy (f ∘ gf⁻¹ ∘ g) (idFun _)
+          fgf⁻¹g~id b =   f (gf⁻¹ (g b))
+                        ≡⟨ sym (inverse-retraction equivg _) ⟩
+                          g⁻¹ (g (f (gf⁻¹ (g b))))
+                        ≡⟨ cong g⁻¹ (inverse-section equivgf _) ⟩
+                          g⁻¹ (g b)
+                        ≡⟨ inverse-retraction equivg _ ⟩
+                          b ∎
+
+    thm471 : isEquiv _ _ f ≃ isEquiv _ _ g
+    thm471 = _ , lem3-3-3 (propIsEquiv _) (propIsEquiv _) to from
+
+  module _ (equivg : isEquiv _ _ g) where
+    compEquiv-r : isEquiv _ _ f ≃ isEquiv _ _ (g ∘ f)
+    compEquiv-r = (λ equivf → compEquiv (_ , equivf) (_ , equivg) .snd)
+                , lem3-3-3 (propIsEquiv _) (propIsEquiv _) _ (λ equivgf → inverse (thm471 equivgf) equivg)
+
+  module _ (equivf : isEquiv _ _ f) where
+    compEquiv-l : isEquiv _ _ g ≃ isEquiv _ _ (g ∘ f)
+    compEquiv-l = (λ equivg → compEquiv (_ , equivf) (_ , equivg) .snd)
+                , lem3-3-3 (propIsEquiv _) (propIsEquiv _) _ (λ equivgf → thm471 equivgf .fst equivf)
