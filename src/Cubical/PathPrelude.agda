@@ -195,6 +195,20 @@ module _ {ℓa ℓb} {A : Set ℓa} {B : A → Set ℓb} where
                                        {x : A} → f {x} ≡ g {x}
   funExtImp p {x} = λ i → p x i
 
+-- Lemma 2.4.2
+module _ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} {f : A → B} where
+  hid : Homotopy f f
+  hid = λ _ → refl
+
+  module _ {g : A → B} where
+    hinv : Homotopy f g → Homotopy g f
+    hinv H = λ a → sym (H a)
+
+    module _ {h : A → B} where
+      infixl 5 _·_
+      _·_ : Homotopy f g → Homotopy g h → Homotopy f h
+      _·_ f~g g~h = λ a → f~g a ◾ g~h a
+
 module _ {ℓ} {A : Set ℓ} where
   contr : isContr A → (φ : I) → (u : Partial A φ) → A
   contr (c , p) φ u = primComp (λ _ → A) φ (λ i o → p (u o) i) c

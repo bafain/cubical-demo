@@ -5,7 +5,7 @@ module Cubical.CoEqualizer where
 open import Cubical.PushOut
 open import Cubical.FromStdLib
 open import Cubical.PathPrelude
-open import Cubical.Lemmas
+open import Cubical.Lemmas      using (trans-id-l)
 open import Cubical.Comp
 open import Cubical.SigmaDirect
 

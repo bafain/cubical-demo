@@ -50,6 +50,23 @@ module _ {ℓ} {A : Set ℓ} where
                         (\ q → trans (trans-id-l _) (cong (λ q → trans q r) (sym (trans-id-l _))))
                         y p q
 
+module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} {f g : A → B} (H : Homotopy f g) where
+  htrans-id : H · hid ≡ H
+  htrans-id = funExt λ a → trans-id (H a)
+
+  htrans-id-l : hid · H ≡ H
+  htrans-id-l = funExt λ a → trans-id-l (H a)
+
+  htrans-inv-r : H · hinv H ≡ hid
+  htrans-inv-r = funExt λ a → trans-inv-r (H a)
+
+  htrans-inv-l : hinv H · H ≡ hid
+  htrans-inv-l = funExt λ a → trans-inv-l (H a)
+
+  module _ {h : A → B} (H' : Homotopy g h) {i : A → B} (H'' : Homotopy h i) where
+    htrans-assoc : H · (H' · H'') ≡ (H · H') · H''
+    htrans-assoc = funExt λ _ → trans-assoc
+
 trans-cong : ∀ {l l'} {A : Set l} {B : Set l'}{x y} (f : A → B)(eq : x ≡ y) z (eq' : y ≡ z)
                → trans (\ i → f (eq i)) (\ i → f (eq' i)) ≡ (\ i → f (trans eq eq' i))
 trans-cong f eq = pathJ _ (trans (trans-id (λ z → f (eq z))) \ j i →  f (trans-id eq (~ j) i) )
