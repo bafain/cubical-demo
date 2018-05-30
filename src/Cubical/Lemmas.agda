@@ -50,6 +50,30 @@ module _ {ℓ} {A : Set ℓ} where
                         (\ q → trans (trans-id-l _) (cong (λ q → trans q r) (sym (trans-id-l _))))
                         y p q
 
+  module _ {x y z z' : A} {p : x ≡ y} {q : x ≡ z} {r : y ≡ z'} where
+    trans''-trans : trans'' p q r ≡ sym q ◾ p ◾ r
+    trans''-trans = pathJ (λ z q → trans'' p q r ≡ sym q ◾ p ◾ r) (subst {P = λ hole → trans'' p refl r ≡ hole ◾ r} (sym (trans-id-l p)) refl) z q
+
+-- Lemma 2.11.2
+module _ {ℓ} {A : Set ℓ} {a b : A} (a≡b : a ≡ b) where
+  module _ {a' b' : A} (a≡a' : a ≡ a') (b≡b' : b ≡ b') where
+    transp-path : transp (λ i → a≡a' i ≡ b≡b' i) a≡b ≡ sym a≡a' ◾ a≡b ◾ b≡b'
+    transp-path = trans''-trans
+
+    lem2-11-2-iii = transp-path
+
+  module _ {a' : A} (a≡a' : a ≡ a') where
+    lem2-11-2-i : transp (λ i → a≡a' i ≡ b) a≡b ≡ sym a≡a' ◾ a≡b
+    lem2-11-2-i =   transp (λ i → a≡a' i ≡ b) a≡b
+                  ≡⟨ lem2-11-2-iii a≡a' refl ⟩
+                    sym a≡a' ◾ a≡b ◾ refl
+                  ≡⟨ trans-id (sym a≡a' ◾ a≡b) ⟩
+                    sym a≡a' ◾ a≡b ∎
+
+  module _ {b' : A} (b≡b' : b ≡ b') where
+    lem2-11-2-ii : transp (λ i → a ≡ b≡b' i) a≡b ≡ a≡b ◾ b≡b'
+    lem2-11-2-ii = refl
+
 module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} {f g : A → B} (H : Homotopy f g) where
   htrans-id : H · hid ≡ H
   htrans-id = funExt λ a → trans-id (H a)
@@ -66,6 +90,13 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} {f g : A → B} (H : Homotopy f
   module _ {h : A → B} (H' : Homotopy g h) {i : A → B} (H'' : Homotopy h i) where
     htrans-assoc : H · (H' · H'') ≡ (H · H') · H''
     htrans-assoc = funExt λ _ → trans-assoc
+
+  module _ {f' g' : A → B} (f≡f' : f ≡ f') (g≡g' : g ≡ g') where
+    transp-homotopy' : transp (λ i → Homotopy (f≡f' i) (g≡g' i)) H ≡ (λ a → trans'' (H a) (happly f≡f' a) (happly g≡g' a))
+    transp-homotopy' = sym (transp-pi (λ i a → (f≡f' i a) ≡ (g≡g' i a)) H)
+
+    transp-homotopy : transp (λ i → Homotopy (f≡f' i) (g≡g' i)) H ≡ hinv (happly f≡f') · H · happly g≡g'
+    transp-homotopy = transp-homotopy' ◾ funExt (λ a → transp-path (H a) (happly f≡f' a) (happly g≡g' a))
 
 trans-cong : ∀ {l l'} {A : Set l} {B : Set l'}{x y} (f : A → B)(eq : x ≡ y) z (eq' : y ≡ z)
                → trans (\ i → f (eq i)) (\ i → f (eq' i)) ≡ (\ i → f (trans eq eq' i))

@@ -28,4 +28,6 @@ open import Cubical.PushOut.Properties
 open import Cubical.Equivalence.Properties
 open import Cubical.Equivalence.HAE
 open import Cubical.Equivalence.Embedding
+open import Cubical.Equivalence.Homotopy
+open import Cubical.Equivalence.Path
 open import Cubical.Embedding.Properties

@@ -39,9 +39,15 @@ module _ {ℓ} {A : Set ℓ} where
                                     ; j (i = i1) → q j })
                                  y
 
+  trans'' : {x y z z' : A} → x ≡ y → x ≡ z → y ≡ z' → z ≡ z'
+  trans'' p q r i = primComp (λ _ → A)
+                             _
+                             (λ { j (i = i0) → q j
+                                ; j (i = i1) → r j })
+                             (p i)
+
   trans : {x y z : A} → x ≡ y → y ≡ z → x ≡ z
-  trans {x = x} p q i = primComp (λ _ → A) _ (λ { j (i = i0) → x
-                                                ; j (i = i1) → q j }) (p i)
+  trans {x = x} p q = trans'' p refl q
 
   infixl 5 _◾_
   _◾_ = trans
@@ -113,8 +119,12 @@ module _ {ℓ} {A : I → Set ℓ} {x : A i0} {y : A i1} where
 transp-refl : ∀{ℓb} → {B : Set ℓb} → (x : B) → primComp (λ j → B) i0 (λ j → empty) x ≡ x
 transp-refl {B = B} x i = primComp (λ _ → B) i ((λ { j (i = i1) → x })) x
 
-transp-pi : ∀{ℓb} → {B : Set ℓb} → {ℓa : I → Level} → (A : (i : I) → Set (ℓa i)) → (f : (B → A i0)) → (λ x → transp A (f x)) ≡ transp (λ i → (B → A i)) f
-transp-pi {B = B} A f i x = (primComp A i0 (λ i → empty)) (f (transp-refl x (~ i)))
+transp-pi : ∀{ℓb} → {B : Set ℓb} → {ℓa : I → Level} → (A : (i : I) → B → Set (ℓa i)) → (f : ((b : B) → A i0 b)) → (λ x → transp (λ i → A i x) (f x)) ≡ transp (λ i → ((b : B) → A i b)) f
+transp-pi {B = B} A f i x = (primComp (λ j → A j (transp-refl x (~ i ∨ j))) i0 (λ i → empty)) (f (transp-refl x (~ i)))
+
+module _ {ℓ} {A : Set ℓ} {a b a' b' : A} {a≡b : a ≡ b} {a≡a' : a ≡ a'} {b≡b' : b ≡ b'} where
+  transp-path' : transp (λ i → a≡a' i ≡ b≡b' i) a≡b ≡ trans'' a≡b a≡a' b≡b'
+  transp-path' = refl
 
 transp-iso : ∀{ℓ}(A : I → Set ℓ)(x : A i0) → transp (\ i → A (~ i)) (transp A x) ≡ x
 transp-iso A x = \ i → primComp (\ j → A (~ j ∧ ~ i)) i (\ { j (i = i1) → x })
@@ -172,7 +182,7 @@ transpP {B = B} p = pathJ (λ y _ → B _ → B y) (λ x → x) _ p
 
 module _ {ℓ ℓ' : Level} {A : Set ℓ} {B : A → Set ℓ'} {x y : A} (p : x ≡ y) where
   transpP≡subst : transpP {B = B} p ≡ subst {P = B} p
-  transpP≡subst = sym (transp-pi (λ j → uncurry (λ (y : A) → λ _ → B y) (snd contrSingl (y , p) j)) (λ x → x))
+  transpP≡subst = sym (transp-pi (λ j _ → uncurry (λ (y : A) → λ _ → B y) (snd contrSingl (y , p) j)) (λ x → x))
 
   transpP≡subst' : {b : B x} → transpP {B = B} p b ≡ subst {P = B} p b
   transpP≡subst' {b} i = transpP≡subst i b
