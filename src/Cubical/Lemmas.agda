@@ -71,6 +71,10 @@ trans-cong : ∀ {l l'} {A : Set l} {B : Set l'}{x y} (f : A → B)(eq : x ≡ y
                → trans (\ i → f (eq i)) (\ i → f (eq' i)) ≡ (\ i → f (trans eq eq' i))
 trans-cong f eq = pathJ _ (trans (trans-id (λ z → f (eq z))) \ j i →  f (trans-id eq (~ j) i) )
 
+module _ {ℓ} {A : I → Set ℓ} {x : A i0} {y : A i1} where
+  fromPathP-equiv : isEquiv (PathP A x y) (transp A x ≡ y) fromPathP
+  fromPathP-equiv = pathToEquiv PathP≡Path .snd
+
 module _ {ℓa ℓb : _} {A : Set ℓa} {B : Set ℓb} where
   module _ {f g : A → B} {x y : A} (H : ∀ x → f x ≡ g x) (p : x ≡ y) where
     -- Lemma 2.4.3:

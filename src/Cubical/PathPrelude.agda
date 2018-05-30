@@ -84,17 +84,31 @@ transp A x = primComp A i0 (λ _ → empty) x
 transp⁻¹ : {ℓ : I → Level} → (A : (i : I) → Set (ℓ i)) → A i1 → A i0
 transp⁻¹ A = transp (λ i → A (~ i))
 
-toPathP : ∀{ℓ}{A : I → Set ℓ}{x : A i0}{y : A i1} → transp A x ≡ y → PathP A x y
-toPathP {ℓ} {A} {x} {y} p i = primComp (λ _ → A i) φ u (xPathP i)
-  where φ = ~ i ∨ i
-        u : I → PartialP φ (λ z → A i)
-        u _ (i = i0) = x
-        u j (i = i1) = p j
-        xPathP : PathP A x (transp A x )
-        xPathP j = fill A _ (λ _ → empty) x j
+id∼transp : ∀ {ℓ} (A : I → Set ℓ) x → PathP A x (transp A x)
+id∼transp A x j = fill A _ (λ _ → empty) x j
 
-fromPathP : ∀{ℓ}{A : I → Set ℓ}{x : A i0}{y : A i1} → PathP A x y → transp A x ≡ y
-fromPathP {A = A} {x} {y} p  j = primComp (\ i → A i) j (\ { i (j = i1) → p i }) x
+transp⁻¹∼id : ∀ {ℓ} (A : I → Set ℓ) x → PathP A (transp⁻¹ A x) x
+transp⁻¹∼id A x j = id∼transp (λ i → A (~ i)) x (~ j)
+
+module _ {ℓ} {A : I → Set ℓ} {x : A i0} {y : A i1} where
+  PathP≡Path : PathP A x y ≡ (transp A x ≡ y)
+  PathP≡Path i = PathP (λ j → A (i ∨ j)) (id∼transp A x i) y
+
+  PathP≡Path′ : (x ≡ transp⁻¹ A y) ≡ PathP A x y
+  PathP≡Path′ i = PathP (λ j → A (i ∧ j)) x (transp⁻¹∼id A y i)
+
+  toPathP : transp A x ≡ y → PathP A x y
+  toPathP = transp⁻¹ (λ i → PathP≡Path i)
+  --      = λ i → primComp (λ j → A (i ∨ ~ j)) _ (λ { j (i = i0) → id∼transp x (~ j) ; j (i = i1) → y }) (x⁺≡y i)
+
+  toPathP⁻¹ : x ≡ transp⁻¹ A y → PathP A x y
+  toPathP⁻¹ = transp (λ i → PathP≡Path′ i)
+
+  fromPathP : PathP A x y → transp A x ≡ y
+  fromPathP = transp (λ i → PathP≡Path i)
+
+  fromPathP⁻¹ : PathP A x y → x ≡ transp⁻¹ A y
+  fromPathP⁻¹ = transp⁻¹ (λ i → PathP≡Path′ i)
 
 transp-refl : ∀{ℓb} → {B : Set ℓb} → (x : B) → primComp (λ j → B) i0 (λ j → empty) x ≡ x
 transp-refl {B = B} x i = primComp (λ _ → B) i ((λ { j (i = i1) → x })) x
