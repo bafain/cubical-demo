@@ -1,9 +1,12 @@
+{-# OPTIONS --cubical #-}
 module Cubical.Equivalence.Properties where
 
 open import Cubical.FromStdLib
 open import Cubical.PathPrelude
 
 open import Cubical.GradLemma
+open import Cubical.NType.Properties
+open import Cubical.NType
 
 -- Lemma 2.4.12
 module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} (A≃B : A ≃ B) where
@@ -115,3 +118,38 @@ module _ {ℓ} {A B C : Set ℓ} (f : A → B) (g : B → C) where
     compEquiv-l : isEquiv _ _ g ≃ isEquiv _ _ (g ∘ f)
     compEquiv-l = (λ equivg → compEquiv (_ , equivf) (_ , equivg) .snd)
                 , lem3-3-3 (propIsEquiv _) (propIsEquiv _) _ (λ equivgf → thm471 equivgf .fst equivf)
+
+module _ {ℓ} {A B : Set ℓ} (f : A → B) where
+  private
+    h : ∀ {C : Set ℓ} → C ≃ (⊤ {ℓ} → C)
+    h = (λ a _ → a) , λ A → (A tt , refl) , λ { (a' , A≡a') i → A≡a' i tt , λ j → A≡a' (i ∧ j) }
+
+  -- using function extensionality
+  lem492 : isEquiv A B f ≃ ∀ (X : Set ℓ) → isEquiv (X → A) (X → B) (f ∘_)
+  lem492 = to , lem3-3-3 (propIsEquiv _) (piPresNType ⟨-1⟩ λ _ → propIsEquiv _) to from
+    where
+      to : isEquiv A B f → ∀ (X : Set ℓ) → isEquiv (X → A) (X → B) (f ∘_)
+      to equivf X  = let f⁻¹ = inverse (f , equivf)
+                     in gradLemma (f ∘_)
+                                  (f⁻¹ ∘_)
+                                  (λ g → funExt λ x → inverse-section    equivf (g x))
+                                  (λ g → funExt λ x → inverse-retraction equivf (g x))
+      from : (∀ (X : Set ℓ) → isEquiv (X → A) (X → B) (f ∘_)) → isEquiv A B f
+      from equivf∘ = let A≃B = A ≃⟨ h ⟩ (⊤ → A) ≃⟨ _ , equivf∘ _ ⟩ (⊤ → B) ≃⟨ inverseEquiv h ⟩ B □
+                     in A≃B .snd
+
+module _ {ℓ ℓ' ℓ''} {X : Set ℓ} {A : X → Set ℓ'} {B : X → Set ℓ''} (A≃B : (x : X) → A x ≃ B x) where
+  private
+    f : (x : X) → A x → B x
+    f x = A≃B x .fst
+
+    equivf : (x : X) → isEquiv _ _ (f x)
+    equivf x = A≃B x .snd
+
+  lem492-d : isEquiv ((x : X) → A x) ((x : X) → B x) (λ g x → f x (g x))
+  lem492-d = let  f⁻¹ : (x : X) → B x → A x
+                  f⁻¹ x = inverse (f x , equivf x)
+             in gradLemma (λ g x → f x (g x))
+                          (λ g x → f⁻¹ x (g x))
+                          (λ g → funExt λ x → inverse-section    (equivf x) (g x))
+                          (λ g → funExt λ x → inverse-retraction (equivf x) (g x))

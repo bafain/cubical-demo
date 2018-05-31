@@ -68,3 +68,9 @@ infixr 9 _∘_
 
 idFun : ∀ {ℓ} → (A : Set ℓ) → A → A
 idFun A x = x
+
+infix 3 _⇔_
+record _⇔_ {f t} (From : Set f) (To : Set t) : Set (ℓ-max f t) where
+  field
+    to   : From → To
+    from : To → From
