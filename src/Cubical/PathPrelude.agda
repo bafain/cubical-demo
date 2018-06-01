@@ -16,6 +16,16 @@ module _ {ℓ} {A : I → Set ℓ} {x : A i0} {y : A i1} where
                                 ; _ (φ = i1) → p i     })
                              (p i)
 
+module _ {ℓ} (A : (i : I) → Set ℓ) {φ : I} (u : (i : I) → Partial (A i) φ) (a0 : A i0 [ φ ↦ u i0 ]) where
+  comp-uniq : (x : (i : I) → A i [ (~ i) ∨ φ ↦ (λ { (i = i0) → ouc a0 ; (φ = i1) → u i itIsOne }) ])
+            → ouc (x i1) ≡ primComp A _ u (ouc a0) -- [ φ ↦ refl ]
+  comp-uniq x j = primComp A _ (λ { k (j = i0) → ouc (x k) ; k (φ = i1) → u k itIsOne }) (ouc a0)
+
+  comp-uniq′ : (x : (i : I) → A i [ (~ i) ∨ φ ↦ (λ { (i = i0) → ouc a0 ; (φ = i1) → u i itIsOne }) ])
+             → (y : (i : I) → A i [ (~ i) ∨ φ ↦ (λ { (i = i0) → ouc a0 ; (φ = i1) → u i itIsOne }) ])
+             → ouc (x i1) ≡ ouc (y i1) -- [ φ ↦ refl ]
+  comp-uniq′ x y j = primComp A _ (λ { k (j = i0) → ouc (x k) ; k (j = i1) → ouc (y k) ; k (φ = i1) → u k itIsOne }) (ouc a0)
+
 module _ {ℓ} {A : Set ℓ} where
   refl : {x : A} → x ≡ x
   refl {x = x} = λ _ → x
@@ -254,6 +264,30 @@ module _ {ℓ ℓ'} (A : Set ℓ) (B : Set ℓ') where
 module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} where
   inverse : A ≃ B → B → A
   inverse (_ , eqv) b = fst (fst (eqv b))
+
+  module _ {f : A → B} (equivf : isEquiv _ _ f) where
+    private
+      f⁻¹ : B → A
+      f⁻¹ = inverse (f , equivf)
+
+    inverse-section : Homotopy (f ∘ f⁻¹) (idFun _)
+    inverse-section b = sym (equivf b .fst .snd)
+
+    inverse-retraction : Homotopy (f⁻¹ ∘ f) (idFun _)
+    inverse-retraction a = cong fst (equivf (f a) .snd (a , refl))
+
+    triangle : ∀ a → cong f (inverse-retraction a) ≡ inverse-section (f a)
+    triangle a k j = comp-uniq′ (λ _ → B)
+                                (λ { i (j = i0) → f (inverse-retraction a (~ i))
+                                   ; _ (j = i1) → f a
+                                   })
+                                (inc (f a))
+                                (λ i → inc (f (inverse-retraction a (~ i ∨ j))))
+                                (λ i → inc (h i j))
+                                k
+      where
+        h : PathP (λ i → f (inverse-retraction a (~ i)) ≡ f a) refl (inverse-section (f a))
+        h i j = cong-d snd (equivf (f a) .snd (a , refl)) (~ i) (~ j)
 
 -- Lemma 2.4.12 (i)
 idEquiv : ∀ {ℓ} → {A : Set ℓ} → A ≃ A

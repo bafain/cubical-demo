@@ -5,11 +5,6 @@ open import Cubical.FromStdLib
 open import Cubical.PathPrelude
 open import Cubical.Comp
 
-module _ {ℓ} (A : (i : I) → Set ℓ) {φ : I} (u : (i : I) → Partial (A i) φ) (a0 : A i0 [ φ ↦ u i0 ]) where
-  comp-uniq : (x : (i : I) → A i [ (~ i) ∨ φ ↦ (λ { (i = i0) → ouc a0 ; (φ = i1) → u i itIsOne }) ])
-            → ouc (x i1) ≡ comp A u a0 -- [ φ ↦ refl ]
-  comp-uniq x j = comp A (λ { k (j = i0) → ouc (x k) ; k (φ = i1) → u k itIsOne }) (inc (ouc a0))
-
 -- Lemma 2.1.4
 module _ {ℓ} {A : Set ℓ} where
   module _ {x y : A} (p : x ≡ y) where
