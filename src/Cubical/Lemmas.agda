@@ -113,6 +113,10 @@ module _ {ℓa ℓb : _} {A : Set ℓa} {B : Set ℓb} where
     lem2-4-3 = pathJ (λ y p → trans (H x) (cong g p) ≡ trans (cong f p) (H y))
                      (trans (trans-id (H x)) (sym (trans-id-l (H x)))) y p
 
+module _ {ℓa : _} {A : Set ℓa} {x y : A} where
+  sym-equiv : isEquiv (x ≡ y) (y ≡ x) sym
+  sym-equiv = λ q → (sym q , refl) , λ { (p , q≡p⁻¹) i → sym (q≡p⁻¹ i) , λ j → q≡p⁻¹ (i ∧ j) }
+
 module _ {ℓa ℓb ℓr : _} {A : Set ℓa} {B : A → Set ℓb} {R : (a : A) → B a → Set ℓr} where
   ac : (∀ x → Σ (B x) λ y → R x y) → Σ ((x : A) → B x) λ f → ∀ x → R x (f x)
   ac g = fst ∘ g , snd ∘ g

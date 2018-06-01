@@ -66,3 +66,13 @@ module _ {ℓa ℓb : _} {A : Set ℓa} {B : A → Set ℓb} where
                  Σ (Σ A λ x → a ≡ x) (λ xp → B (xp .fst))
                ≃⟨ lem3-11-9-ii _ _ contrSingl ⟩
                  B a □
+
+module _ {ℓ : _} {A : Set ℓ} {B : Set ℓ} where
+  lem4-8-2 : ∀ (f : A → B) → A ≃ Σ B (fiber f)
+  lem4-8-2 f =   A
+               ≃⟨ inverseEquiv (lem3-11-9-i A (singl ∘ f) (λ _ → contrSingl)) ⟩
+                 Σ A (λ a → singl (f a))
+               ≃⟨ Σ-swap ⟩
+                 Σ B (λ b → Σ A (λ a → f a ≡ b ))
+               ≃⟨ _ , totalEquiv _ _ _ (λ b → totalEquiv _ _ _ λ a → sym-equiv) ⟩
+                 (Σ B λ b → fiber f b) □
