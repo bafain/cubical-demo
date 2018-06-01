@@ -70,6 +70,21 @@ _≃-qed _□ : ∀ {ℓ} (A : Set ℓ) → A ≃ A
 _ ≃-qed  = idEquiv
 _□ = _≃-qed
 
+module _ {ℓ} {A B : Set ℓ} where
+  private
+    module _ {f : A → B} {g : A → B} (H : Homotopy f g) (equivf : isEquiv _ _ f) where
+      f⁻¹     = inverse            (_ , equivf)
+      ff⁻¹∼id = inverse-section    equivf
+      f⁻¹f∼id = inverse-retraction equivf
+
+      ∼-preserves-isEquiv′ : isEquiv _ _ g
+      ∼-preserves-isEquiv′ = gradLemma _ f⁻¹ (λ b → g (f⁻¹ b) ≡⟨ sym (H (f⁻¹ b)) ⟩ f (f⁻¹ b) ≡⟨ ff⁻¹∼id b ⟩ b ∎)
+                                             (λ a → f⁻¹ (g a) ≡⟨ cong f⁻¹ (sym (H a)) ⟩ f⁻¹ (f a) ≡⟨ f⁻¹f∼id a ⟩ a ∎)
+
+  module _ {f : A → B} {g : A → B} (H : Homotopy f g) where
+    ∼-preserves-isEquiv : isEquiv _ _ f ≃ isEquiv _ _ g
+    ∼-preserves-isEquiv = ∼-preserves-isEquiv′ H , lem3-3-3 (propIsEquiv _) (propIsEquiv _) _ (∼-preserves-isEquiv′ (hinv H))
+
 module _ {ℓ} {A B C : Set ℓ} (f : A → B) (g : B → C) where
   module _ (equivgf : isEquiv _ _ (g ∘ f)) where
     private
