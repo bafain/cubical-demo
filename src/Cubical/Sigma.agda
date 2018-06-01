@@ -326,6 +326,16 @@ module _ {ℓa ℓb ℓc} {A : Set ℓa} {B : A → Set ℓb} {C : Σ A B → Se
 
   Σ-assoc = ex2-10
 
+module _ {ℓa ℓb ℓc} {A : Set ℓa} {B : Set ℓb} {C : A → B → Set ℓc} where
+  Σ-swap : Σ A (λ a → Σ B λ b → C a b) ≃ Σ B (λ b → Σ A λ a → C a b)
+  Σ-swap = to , λ { (a , b , c) → (_ , refl) , λ { (_ , p) i → from (p i) , λ j → p (i ∧ j) }}
+    where
+      to : Σ A (λ a → Σ B λ b → C a b) → Σ B (λ b → Σ A λ a → C a b)
+      to (a , b , c) = b , a , c
+
+      from : Σ B (λ b → Σ A λ a → C a b) → Σ A (λ a → Σ B λ b → C a b)
+      from (b , a , c) = a , b , c
+
 -- Exercise 2.17 (iii-Σ-l)
 module _ {ℓa ℓa' ℓb} {A : Set ℓa} {A' : Set ℓa'} {B : A → Set ℓb} where
   module _ (A≃A' : A ≃ A') where
