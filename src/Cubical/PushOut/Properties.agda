@@ -4,8 +4,9 @@ module Cubical.PushOut.Properties where
 open import Cubical.FromStdLib
 open import Cubical.PathPrelude
 
+open import Cubical.Equivalence.Properties
 open import Cubical.GradLemma
-
+open import Cubical.NType.Properties
 open import Cubical.PushOut
 
 -- Proposition 1.8.4 in Brunerie
@@ -35,3 +36,27 @@ module _ {ℓ} {A B C X : Set ℓ} (f : C → A) (g : C → B) where
 
       h₁h₂≡id : ∀ p → h₁ (h₂ p) ≡ p
       h₁h₂≡id = primPushOutElim _ (λ _ → refl) (λ _ → refl) λ _ _ → refl
+
+module _ {ℓ} {A B C P : Set ℓ} {f : C → A} {g : C → B} {i : A → P} {j : B → P} {H : Homotopy (i ∘ f) (j ∘ g)} where
+  open PO.Cocone f g
+  open PO.Canonical f g
+
+  private
+    c = cocone i j H
+
+  module _ where
+    private
+      [i,j] : PushOut f g → P
+      [i,j] = inverse (_ , lem682 P) c
+
+      h : ∀ {P'} → Homotopy (toCocone 𝒫 {P'} ∘ (_∘ [i,j])) (toCocone c {P'})
+      h = hid
+
+      to : isPushOut c → isEquiv _ _ [i,j]
+      to poc = inverse (pre-equiv [i,j]) (λ X → inverse (thm471 (_∘ [i,j]) (toCocone 𝒫) (inverse (∼-preserves-isEquiv h) (poc X))) (lem682 X))
+
+      from : isEquiv _ _ [i,j] → isPushOut c
+      from equiv[ij] E = ∼-preserves-isEquiv h .fst (compEquiv (_ , pre-equiv [i,j] .fst equiv[ij] _) (_ , lem682 E) .snd)
+
+    unique : isPushOut c ≃ isEquiv _ _ [i,j]
+    unique = _ , lem3-3-3 (propIsPushOut c) (propIsEquiv _) to from
