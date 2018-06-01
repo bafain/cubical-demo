@@ -326,6 +326,36 @@ module _ {ℓa ℓb ℓc} {A : Set ℓa} {B : A → Set ℓb} {C : Σ A B → Se
 
   Σ-assoc = ex2-10
 
+-- Exercise 2.17 (iii-Σ-l)
+module _ {ℓa ℓa' ℓb} {A : Set ℓa} {A' : Set ℓa'} {B : A → Set ℓb} where
+  module _ (A≃A' : A ≃ A') where
+    private
+      f       = A≃A' .fst
+      f⁻¹     = inverse A≃A'
+      ff⁻¹∼id = inverse-retraction (invEquiv A≃A' .snd)
+      f⁻¹f∼id = inverse-section (invEquiv A≃A' .snd)
+
+      to : Σ A B → Σ A' (λ a' → B (f⁻¹ a'))
+      to (a , b) = f a , transp (λ i → B (f⁻¹f∼id a (~ i))) b
+
+      from : Σ A' (λ a' → B (f⁻¹ a')) → Σ A B
+      from (a' , b') = f⁻¹ a' , b'
+
+      tofrom∼id : Homotopy (to ∘ from) (idFun _)
+      tofrom∼id (a' , b') i = ff⁻¹∼id a' i , primComp (λ j → B (invEquiv A≃A' .snd (f⁻¹ a') .snd (a' , refl) i .snd j))
+                                                      _
+                                                      (λ { j (i = i1) → b' })
+                                                      b'
+
+      fromto∼id : Homotopy (from ∘ to) (idFun _)
+      fromto∼id (a , b) i = f⁻¹f∼id a i , primComp (λ j → B (f⁻¹f∼id a (i ∨ ~ j)))
+                                                   _
+                                                   (λ { j (i = i1) → b })
+                                                   b
+
+    ex2-17-iii-Σ-l : Σ A B ≃ Σ A' λ a' → B (f⁻¹ a')
+    ex2-17-iii-Σ-l = to , gradLemma _ from tofrom∼id fromto∼id
+
 -- ×-types are commutative (and associative)
 module _ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} where
   ×-comm : (A × B) ≃ (B × A)
