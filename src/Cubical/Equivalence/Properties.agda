@@ -153,6 +153,32 @@ module _ {ℓ} {A B : Set ℓ} (f : A → B) where
       from equivf∘ = let A≃B = A ≃⟨ h ⟩ (⊤ → A) ≃⟨ _ , equivf∘ _ ⟩ (⊤ → B) ≃⟨ inverseEquiv h ⟩ B □
                      in A≃B .snd
 
+  pre-equiv : isEquiv A B f ≃ ∀ (X : Set ℓ) → isEquiv (B → X) (A → X) (_∘ f)
+  pre-equiv = to , lem3-3-3 (propIsEquiv _) (piPresNType ⟨-1⟩ λ _ → propIsEquiv _) to from
+    where
+      to : isEquiv A B f → ∀ (X : Set ℓ) → isEquiv (B → X) (A → X) (_∘ f)
+      to equivf  X = let f⁻¹ = inverse (f , equivf)
+                     in gradLemma (_∘ f)
+                                  (λ g b → g (f⁻¹ b))
+                                  (λ g → funExt (λ a → cong g (inverse-retraction equivf a)))
+                                  (λ g → funExt (λ b → cong g (inverse-section equivf b)))
+
+      from : (∀ (X : Set ℓ) → isEquiv (B → X) (A → X) (_∘ f)) → isEquiv A B f
+      from equiv∘f = let f⁻¹     = inverse (_∘ f , equiv∘f _) (idFun _)
+                         f⁻¹f≡id = inverse-section (equiv∘f _) (idFun _)
+                         ff⁻¹≡id = left-cancel (equiv∘f _) (cong (f ∘_) f⁻¹f≡id)
+                     in gradLemma f f⁻¹ (happly ff⁻¹≡id) (happly f⁻¹f≡id)
+
+  pre-equiv-d : isEquiv A B f → ∀ {X : B → Set ℓ} → isEquiv ((b : B) → X b) ((a : A) → X (f a)) (_∘ f)
+  pre-equiv-d equivf {X} = let f⁻¹ = inverse (f , equivf)
+                           in gradLemma (_∘ f)
+                                        (λ g b → transp (λ i → X (inverse-section equivf b i)) (g (f⁻¹ b)))
+                                        (λ g → funExt (λ a i → primComp (λ j → X (triangle equivf a (~ i) j))
+                                                                        _
+                                                                        (λ { j (i = i1) → cong-d g (inverse-retraction equivf a) j })
+                                                                        (g (f⁻¹ (f a)))))
+                                        λ g → funExt (λ b → fromPathP (cong-d g (inverse-section equivf b)))
+
 module _ {ℓ ℓ' ℓ''} {X : Set ℓ} {A : X → Set ℓ'} {B : X → Set ℓ''} (A≃B : (x : X) → A x ≃ B x) where
   private
     f : (x : X) → A x → B x

@@ -334,6 +334,9 @@ module _ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} where
         h : PathP (λ i → f (inverse-retraction a (~ i)) ≡ f a) refl (inverse-section (f a))
         h i j = cong-d snd (equivf (f a) .snd (a , refl)) (~ i) (~ j)
 
+    left-cancel : ∀ {a a'} → f a ≡ f a' → a ≡ a'
+    left-cancel {a} {a'} fa≡fa' = cong fst (contrIsProp (equivf (f a)) (a , refl) (a' , fa≡fa'))
+
 -- Lemma 2.4.12 (i)
 idEquiv : ∀ {ℓ} → {A : Set ℓ} → A ≃ A
 idEquiv {A = A} = idFun A , (λ y → (y , refl) , snd contrSingl)
