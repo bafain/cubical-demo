@@ -3,6 +3,8 @@ module Cubical.PushOut where
 
 open import Cubical.PathPrelude hiding (glue)
 open import Cubical.Equivalence.HAE
+open import Cubical.Equivalence.Homotopy
+open import Cubical.Fiberwise
 open import Cubical.Sub
 open import Cubical.FromStdLib
 open import Cubical.NType
@@ -42,6 +44,48 @@ module _ {ℓ} {A B C : Set ℓ} where
         i : A → D
         j : B → D
         h : Homotopy (i ∘ f) (j ∘ g)
+
+    module _ (D : Set ℓ) where
+      private
+        D-cocone-Σ : Set ℓ
+        D-cocone-Σ = Σ (A → D) λ i → Σ (B → D) λ j → Homotopy (i ∘ f) (j ∘ g)
+
+        to-Σ : D -cocone → D-cocone-Σ
+        to-Σ (cocone i j h) = i , j , h
+
+        from-Σ : D-cocone-Σ → D -cocone
+        from-Σ (i , j , h) = cocone i j h
+
+        to-Σ-equiv : isEquiv _ _ to-Σ
+        to-Σ-equiv = λ c → (from-Σ c , refl) , λ { (c' , c≡toc') r → from-Σ (c≡toc' r) , λ s → c≡toc' (r ∧ s) }
+
+      cocone-Σ-equiv : D -cocone ≃ D-cocone-Σ
+      cocone-Σ-equiv = _ , to-Σ-equiv
+
+    module _ {D : Set ℓ} (c c' : D -cocone) where
+      private
+        _D-cocone-Σ-≡_ : D -cocone → D -cocone → Set ℓ
+        cocone i j H D-cocone-Σ-≡ cocone i' j' H' = Σ (i ≡ i') λ i≡i' → Σ (j ≡ j') λ j≡j' → PathP (λ r → Homotopy (i≡i' r ∘ f) (j≡j' r ∘ g)) H H'
+
+        _D-cocone-≡_ : D -cocone → D -cocone → Set ℓ
+        cocone i j H D-cocone-≡ cocone i' j' H' = Σ (i ≡ i') λ i≡i' → Σ (j ≡ j') λ j≡j' → H · happly (cong (_∘ g) j≡j') ≡ happly (cong (_∘ f) i≡i') · H'
+
+        D-cocone-Σ-≡-contr : isContr (Σ (D -cocone) λ c' → c D-cocone-Σ-≡ c')
+        D-cocone-Σ-≡-contr = (c , refl , refl , refl)
+                           , λ { (_ , i≡i' , j≡j' , H≡H') r → cocone (i≡i' r) (j≡j' r) (H≡H' r)
+                                                            , (λ s → i≡i' (r ∧ s)) , (λ s → j≡j' (r ∧ s)) , λ s → H≡H' (r ∧ s) }
+
+        D-cocone-≡-contr : isContr (Σ (D -cocone) λ c' → c D-cocone-≡ c')
+        D-cocone-≡-contr = equivPreservesNType {n = ⟨-2⟩} (_ , totalEquiv _ _ _ (λ c' → h c' .snd)) D-cocone-Σ-≡-contr
+          where
+            h : ∀ c' → c D-cocone-Σ-≡ c' ≃ c D-cocone-≡ c'
+            h _ = _ , totalEquiv _ _ _ (λ P → totalEquiv _ _ _ (λ Q → homotopy-≡ .snd))
+
+      cocone-≡ : (c ≡ c') ≃ c D-cocone-≡ c'
+      cocone-≡ = r c' , fiberEquiv _ _ r (contrEquiv contrSingl D-cocone-≡-contr) c'
+        where
+          r : ∀ c' → c ≡ c' → c D-cocone-≡ c'
+          r = pathJ _ (D-cocone-≡-contr .fst .snd)
 
   module _ {f : C → A} {g : C → B} where
     open Cocone f g
