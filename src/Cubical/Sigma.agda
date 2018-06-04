@@ -380,3 +380,14 @@ module _ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} where
   module _ {ℓc} {C : Set ℓc} where
     ×-assoc : (A × B × C) ≃ ((A × B) × C)
     ×-assoc = Σ-assoc
+
+module _ {ℓx ℓa ℓb} {X : Set ℓx} {A : X → Set ℓa} {B : (x : X) → A x → Set ℓb} where
+  private
+    to : ((x : X) → Σ (A x) (B x)) → (Σ ((x : X) → A x) λ f → (x : X) → B x (f x))
+    to F = fst ∘ F , snd ∘ F
+
+    from : (Σ ((x : X) → A x) λ f → (x : X) → B x (f x)) → ((x : X) → Σ (A x) (B x))
+    from (a , b) = λ x → a x , b x
+
+  prop : ((x : X) → Σ (A x) (B x)) ≃ (Σ ((x : X) → A x) λ f → (x : X) → B x (f x))
+  prop = to , λ x → (from x , refl) , λ { (F , x≡toF) i → from (x≡toF i) , λ j → x≡toF (i ∧ j) }

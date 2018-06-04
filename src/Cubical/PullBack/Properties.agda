@@ -9,6 +9,7 @@ open import Cubical.Fiberwise
 open import Cubical.Lemmas
 open import Cubical.NType
 open import Cubical.NType.Properties
+open import Cubical.Pi
 open import Cubical.PullBack as PB
 
 private
@@ -53,3 +54,43 @@ module _ {A B C D : Set ℓ}
 
       from : (∀ a → isEquiv _ _ (Q H a)) → isPullBack c
       from equivQ = inverse unique (∼-preserves-isEquiv H' .fst (compEquiv (lem4-8-2 p) (_ , totalEquiv _ _ _ equivQ) .snd))
+
+-- Exercise 2.12
+module _ {A B C D B' D' : Set ℓ}
+         (f : A → D) (g : B → D) (p : C → A) (q : C → B)
+         (f' : D → D') (q' : B → B') (g' : B' → D')
+         (H : Homotopy (f ∘ p) (g ∘ q))
+         (H' : Homotopy (f' ∘ g) (g' ∘ q'))
+         (let open PB.Cone)
+         (let left  = cone {f = f}  {g = g}  p q  H)
+         (let right = cone {f = f'} {g = g'} g q' H')
+         (pbr : isPullBack right) where
+  private
+    H'∘H : Homotopy (f' ∘ f ∘ p) (g' ∘ q' ∘ q)
+    H'∘H = λ c → cong f' (H c) ◾ H' (q c)
+
+    left∘right : _-cone (f' ∘ f) g' C
+    left∘right = cone p (q' ∘ q) H'∘H
+
+    Q-functorial : ∀ a → Homotopy (Q H'∘H a) (Q {f = f'} {g = g'} H' (f a) ∘ Q {f = f} H a)
+    Q-functorial a (c , a≡pc) i = q' (q c) , h i
+      where
+        h : cong (f' ∘ f) a≡pc ◾ (cong f' (H c) ◾ H' (q c)) ≡ cong f' (cong f a≡pc ◾ H c) ◾ H' (q c)
+        h =   cong (f' ∘ f) a≡pc ◾ (cong f' (H c) ◾ H' (q c))
+            ≡⟨ trans-assoc ⟩
+              cong (f' ∘ f) a≡pc ◾ cong f' (H c) ◾ H' (q c)
+            ≡⟨ cong (_◾ H' (q c)) (cong (_◾ cong f' (H c)) (cong-∘ f f' a≡pc)) ⟩
+              cong f' (cong f a≡pc) ◾ cong f' (H c) ◾ H' (q c)
+            ≡⟨ cong (_◾ H' (q c)) (trans-cong f' (cong f a≡pc) _ (H c)) ⟩
+              cong f' (cong f a≡pc ◾ H c) ◾ H' (q c) ∎
+
+  paste : isPullBack left ≃ isPullBack left∘right
+  paste =   isPullBack left
+          ≃⟨ lem7-6-8 left ⟩
+            (∀ a → isEquiv (fiber p a) (fiber g (f a)) (Q H a))
+          ≃⟨ ex2-17-iii-Π-r (λ a → compEquiv-r _ _ (lem7-6-8 right .fst pbr (f a))) ⟩
+            (∀ a → isEquiv (fiber p a) (fiber g' (f' (f a))) (Q {f = f'} {g = g'} H' (f a) ∘ Q {f = f} H a))
+          ≃⟨ ex2-17-iii-Π-r (λ a → ∼-preserves-isEquiv (hinv (Q-functorial a))) ⟩
+            (∀ a → isEquiv (fiber p a) (fiber g' (f' (f a))) (Q H'∘H a))
+          ≃⟨ inverseEquiv (lem7-6-8 left∘right) ⟩
+            isPullBack left∘right □

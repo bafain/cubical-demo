@@ -34,3 +34,4 @@ open import Cubical.Equivalence.Embedding
 open import Cubical.Equivalence.Homotopy
 open import Cubical.Equivalence.Path
 open import Cubical.Embedding.Properties
+open import Cubical.Pi
