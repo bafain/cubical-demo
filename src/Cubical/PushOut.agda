@@ -4,6 +4,8 @@ module Cubical.PushOut where
 open import Cubical.PathPrelude
 open import Cubical.Sub
 open import Cubical.FromStdLib
+open import Cubical.NType
+open import Cubical.NType.Properties
 
 postulate
   P : ∀ {l} → {A B C : Set l} → (f : C → A) (g : C → B) → Set l
@@ -25,3 +27,13 @@ primitive
                     → (il : ∀ a → M (inl a)) (ir : ∀ b → M (inr b))
                     → (p : ∀ c → PathP (\ i → M (push c i)) (il (f c)) (ir (g c)))
                     → ∀ x → M x
+
+module _ {ℓ} {A B C : Set ℓ} where
+  -- Definition 6.8.1
+  module Cocone (f : C → A) (g : C → B) where
+    record _-cocone (D : Set ℓ) : Set ℓ where
+      constructor cocone
+      field
+        i : A → D
+        j : B → D
+        h : Homotopy (i ∘ f) (j ∘ g)
