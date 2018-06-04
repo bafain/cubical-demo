@@ -6,8 +6,9 @@ open import Cubical.PathPrelude
 
 open import Cubical.Equivalence.Properties
 open import Cubical.GradLemma
+open import Cubical.Lemmas
 open import Cubical.NType.Properties
-open import Cubical.PushOut
+open import Cubical.PushOut as PO
 
 -- Proposition 1.8.4 in Brunerie
 module _ {ℓ} {A B : Set ℓ} (f : A → B) where
@@ -36,6 +37,35 @@ module _ {ℓ} {A B C X : Set ℓ} (f : C → A) (g : C → B) where
 
       h₁h₂≡id : ∀ p → h₁ (h₂ p) ≡ p
       h₁h₂≡id = primPushOutElim _ (λ _ → refl) (λ _ → refl) λ _ _ → refl
+
+module _ {ℓ} {A B C P P' : Set ℓ} (f : C → A) (g : C → B) (P≃P' : P ≃ P') where
+  open PO.Cocone f g
+
+  private
+    p : P → P'
+    p = P≃P' .fst
+
+    p⁻¹ : P' → P
+    p⁻¹ = inverse P≃P'
+
+    to : P -cocone → P' -cocone
+    to (cocone i j h) = cocone (p ∘ i) (p ∘ j) (left-whisker p h)
+
+    from : P' -cocone → P -cocone
+    from (cocone i j h) = cocone (p⁻¹ ∘ i) (p⁻¹ ∘ j) (left-whisker p⁻¹ h)
+
+    tofrom∼id : ∀ c → to (from c) ≡ c
+    tofrom∼id (cocone i j h) r = cocone (λ a   → inverse-section (P≃P' .snd) (i a)   r)
+                                        (λ b   → inverse-section (P≃P' .snd) (j b)   r)
+                                        (λ c s → inverse-section (P≃P' .snd) (h c s) r)
+
+    fromto∼id : ∀ c → from (to c) ≡ c
+    fromto∼id (cocone i j h) r = cocone (λ a   → inverse-retraction (P≃P' .snd) (i a)   r)
+                                        (λ b   → inverse-retraction (P≃P' .snd) (j b)   r)
+                                        (λ c s → inverse-retraction (P≃P' .snd) (h c s) r)
+
+  cocone-preserves-≃ : P -cocone ≃ P' -cocone
+  cocone-preserves-≃ = to , gradLemma _ from tofrom∼id fromto∼id
 
 module _ {ℓ} {A B C P : Set ℓ} {f : C → A} {g : C → B} {i : A → P} {j : B → P} {H : Homotopy (i ∘ f) (j ∘ g)} where
   open PO.Cocone f g
