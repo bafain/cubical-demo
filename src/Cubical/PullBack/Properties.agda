@@ -6,6 +6,7 @@ open import Cubical.PathPrelude
 
 open import Cubical.Equivalence.Properties
 open import Cubical.Fiberwise
+open import Cubical.GradLemma
 open import Cubical.Lemmas
 open import Cubical.NType
 open import Cubical.NType.Properties
@@ -54,6 +55,35 @@ module _ {A B C D : Set ℓ}
 
       from : (∀ a → isEquiv _ _ (Q H a)) → isPullBack c
       from equivQ = inverse unique (∼-preserves-isEquiv H' .fst (compEquiv (lem4-8-2 p) (_ , totalEquiv _ _ _ equivQ) .snd))
+
+module _ {ℓ} {A B D C C' : Set ℓ} (f : A → D) (g : B → D) (C≃C' : C ≃ C') where
+  open PB.Cone f g
+
+  private
+    c : C → C'
+    c = C≃C' .fst
+
+    c⁻¹ : C' → C
+    c⁻¹ = inverse C≃C'
+
+    to : C -cone → C' -cone
+    to (cone p q H) = cone (p ∘ c⁻¹) (q ∘ c⁻¹) (right-whisker c⁻¹ H)
+
+    from : C' -cone → C -cone
+    from (cone p q H) = cone (p ∘ c) (q ∘ c) (right-whisker c H)
+
+    tofrom∼id : ∀ c → to (from c) ≡ c
+    tofrom∼id (cone p q H) i = cone (λ c'   → p (inverse-section (C≃C' .snd) c' i))
+                                    (λ c'   → q (inverse-section (C≃C' .snd) c' i))
+                                    (λ c' j → H (inverse-section (C≃C' .snd) c' i) j)
+
+    fromto∼id : ∀ c → from (to c) ≡ c
+    fromto∼id (cone p q H) i = cone (λ c   → p (inverse-retraction (C≃C' .snd) c i))
+                                    (λ c   → q (inverse-retraction (C≃C' .snd) c i))
+                                    (λ c j → H (inverse-retraction (C≃C' .snd) c i) j)
+
+  cone-preserves-≃ : C -cone ≃ C' -cone
+  cone-preserves-≃ = to , gradLemma _ from tofrom∼id fromto∼id
 
 -- Exercise 2.12
 module _ {A B C D B' D' : Set ℓ}
