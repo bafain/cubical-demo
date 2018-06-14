@@ -26,6 +26,10 @@ module _ {ℓ} (A : (i : I) → Set ℓ) {φ : I} (u : (i : I) → Partial (A i)
              → ouc (x i1) ≡ ouc (y i1) -- [ φ ↦ refl ]
   comp-uniq′ x y j = primComp A _ (λ { k (j = i0) → ouc (x k) ; k (j = i1) → ouc (y k) ; k (φ = i1) → u k itIsOne }) (ouc a0)
 
+module _  {ℓ} {A : Set ℓ} {a b a' b' : A} {α : a ≡ b} {β : a' ≡ b'} {γ : a ≡ a'} {δ : b ≡ b'} where
+  rotate : PathP (λ j → α j ≡ β j) γ δ → PathP (λ i → γ i ≡ δ i) α β
+  rotate s i j = s j i
+
 module _ {ℓ} {A : Set ℓ} where
   refl : {x : A} → x ≡ x
   refl {x = x} = λ _ → x
