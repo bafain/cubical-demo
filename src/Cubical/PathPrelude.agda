@@ -122,6 +122,27 @@ transp-refl {B = B} x i = primComp (λ _ → B) i ((λ { j (i = i1) → x })) x
 transp-pi : ∀{ℓb} → {B : Set ℓb} → {ℓa : I → Level} → (A : (i : I) → B → Set (ℓa i)) → (f : ((b : B) → A i0 b)) → (λ x → transp (λ i → A i x) (f x)) ≡ transp (λ i → ((b : B) → A i b)) f
 transp-pi {B = B} A f i x = (primComp (λ j → A j (transp-refl x (~ i ∨ j))) i0 (λ i → empty)) (f (transp-refl x (~ i)))
 
+module _ {ℓa ℓb} {A : (i : I) → Set ℓa} (B : (i : I) → A i → Set ℓb) where
+  module _ (φ  : I)
+           (f  : (i : I) → Partial ((a : A i) → B i a) φ)
+           (f₀ : ((a₀ : A i0) → B i0 a₀) [ φ ↦ f i0 ])
+           (x  : (i : I) → A i) where
+    private
+      x₀     = x i0
+      x₁     = x i1
+      f₀≡f₁  = fill (λ i → (x : A i) → B i x) _ f (ouc f₀)
+      f₁     = f₀≡f₁ i1
+
+    congP : PathP (λ i → B i (x i)) (ouc f₀ x₀) (f₁ x₁)
+    congP i = f₀≡f₁ i (x i)
+
+  module _ (f₀    : (a₀ : A i0) → B i0 a₀)
+           (f₁    : (a₁ : A i1) → B i1 a₁)
+           (f₀≡f₁ : PathP (λ i → (a : A i) → B i a) f₀ f₁)
+           (x₀    : A i0) where
+    happlyP : PathP (λ i → B i (id∼transp A x₀ i)) (f₀ x₀) (f₁ (transp A x₀))
+    happlyP i = f₀≡f₁ i (id∼transp A x₀ i)
+
 module _ {ℓ} {A : Set ℓ} {a b a' b' : A} {a≡b : a ≡ b} {a≡a' : a ≡ a'} {b≡b' : b ≡ b'} where
   transp-path' : transp (λ i → a≡a' i ≡ b≡b' i) a≡b ≡ trans'' a≡b a≡a' b≡b'
   transp-path' = refl

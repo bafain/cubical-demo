@@ -33,10 +33,6 @@ lemPathSig {ℓ} {ℓ'} {A} {B} t u = isoToPath f g s r where
 nonDepPath : ∀{ℓ} {A : Set ℓ} → (t u : A) → (t ≡ u) ≡ (PathP (λ i → A) t u)
 nonDepPath {ℓ} {A} t u = refl
 
-congP : ∀ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} {x y : A} (f : A → B) →
-   Path x y → Path (f x) (f y)
-congP f p = λ i → f (p i)
-
 lemPathAnd : ∀ {ℓ} {A : Set ℓ} {B : Set ℓ} (t u : and {ℓ} A B) →
    Path (Path  t u)
    (and (Path (t .fst) (u .fst))
@@ -46,7 +42,7 @@ lemPathAnd {ℓ} {A} {B} t u  =
  let q : Path (Σ {ℓ} (Path (fst t) (fst u))
            (λ p₁ → PathP (λ i → B) (snd t) (snd u)))
            (and (Path (t .fst) (u .fst)) (Path (t .snd) (u .snd)))
-     q = congP (and _) ((sym (nonDepPath _ _)))
+     q = cong (and _) ((sym (nonDepPath _ _)))
  in
  trans p q
 
