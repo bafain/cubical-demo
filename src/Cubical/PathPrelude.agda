@@ -212,12 +212,46 @@ module _ {ℓa ℓb} {A : Set ℓa} {B : A → Set ℓb} where
   happly : {f g : (x : A) → B x} → f ≡ g → ((x : A) → f x ≡ g x)
   happly f≡g x = λ i → f≡g i x
 
+  papply : {f g : (x : A) → B x} → f ≡ g → {x y : A} → (x≡y : x ≡ y) → PathP (λ i → B (x≡y i)) (f x) (g y)
+  papply f≡g x≡y = λ i → f≡g i (x≡y i)
+
   funExt : {f g : (x : A) → B x} → ((x : A) → f x ≡ g x) → f ≡ g
   funExt p = λ i x → p x i
 
   funExtImp : {f g : {x : A} → B x} → ((x : A) → f {x} ≡ g {x}) →
                                        {x : A} → f {x} ≡ g {x}
   funExtImp p {x} = λ i → p x i
+
+module _ {ℓa ℓb} {A : Set ℓa} {B : I → A → Set ℓb} {f : (x : A) → B i0 x} {g : (x : A) → B i1 x} (φ : ∀ {x y : A} (p : x ≡ y) → PathP (λ i → B i (p i)) (f x) (g y)) where
+  papply′ : PathP (λ i → (x : A) → B i x) f g → {x y : A} → (x≡y : x ≡ y) → PathP (λ i → B i (x≡y i)) (f x) (g y)
+  papply′ f≡g x≡y = λ i → f≡g i (x≡y i)
+
+  funExt′ : PathP (λ i → (x : A) → B i x) f g
+  funExt′ = λ i x → φ refl i
+
+  funExt′-β : ∀ {x y : A} (p : x ≡ y) → papply′ funExt′ p ≡ φ p
+  funExt′-β = pathJ (λ y p → (λ i → funExt′ i (p i)) ≡ φ p) refl _
+
+module _ {ℓa ℓb} {A : I → Set ℓa} {B : (i : I) → A i → Set ℓb} {f : (x0 : A i0) → B i0 x0} {g : (x1 : A i1) → B i1 x1} where
+  papplyP : PathP (λ i → (x : A i) → B i x) f g → ∀ {x0 x1} (x : PathP A x0 x1) → PathP (λ i → B i (x i)) (f x0) (g x1)
+  papplyP f≡g x = λ i → f≡g i (x i)
+
+module _ {ℓa ℓb} {A : I → Set ℓa} {B : (i : I) → A i → Set ℓb} {f : (x0 : A i0) → B i0 x0} {g : (x1 : A i1) → B i1 x1}
+         (φ : ∀ {x0 x1} (x : PathP A x0 x1) → PathP (λ i → B i (x i)) (f x0) (g x1)) where
+  private
+    M : (A1 : Set ℓa) → A i0 ≡ A1 → Set (ℓ-max ℓa (ℓ-suc ℓb))
+    M A1 A = ∀ {B1 : A1 → Set ℓb} (B : PathP (λ i → A i → Set ℓb) (B i0) B1)
+             → {f : (x0 : A i0) → B i0 x0} {g : (x1 : A1) → B1 x1} (φ : ∀ {x0 x1} (x : PathP (λ i → A i) x0 x1) → PathP (λ i → B i (x i)) (f x0) (g x1))
+             → Σ (PathP (λ i → (x : A i) → B i x) f g) (λ funExtP → ∀ {x0 x1} (x : PathP (λ i → A i) x0 x1) → papplyP funExtP x ≡ φ x)
+
+    h' : M (A i1) (λ i → A i)
+    abstract h' = pathJ M (λ B φ → funExt′ {B = λ i → B i} φ , funExt′-β {B = λ i → B i} φ) (A i1) (λ i → A i)
+
+  funExtP : PathP (λ i → (x : A i) → B i x) f g
+  funExtP = h' (λ i x → B i x) φ .fst
+
+  funExtP-β : ∀ {x0 x1} (x : PathP A x0 x1) → papplyP funExtP x ≡ φ x
+  funExtP-β = h' (λ i x → B i x) φ .snd
 
 -- Lemma 2.4.2
 module _ {ℓa ℓb} {A : Set ℓa} {B : Set ℓb} {f : A → B} where
