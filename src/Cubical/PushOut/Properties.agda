@@ -5,6 +5,7 @@ open import Cubical.FromStdLib
 open import Cubical.PathPrelude
 
 open import Cubical.Equivalence.Properties
+open import Cubical.Fiberwise
 open import Cubical.GradLemma
 open import Cubical.Lemmas
 open import Cubical.NType.Properties
@@ -64,8 +65,34 @@ module _ {ℓ} {A B C P P' : Set ℓ} (f : C → A) (g : C → B) (P≃P' : P �
                                         (λ b   → inverse-retraction (P≃P' .snd) (j b)   r)
                                         (λ c s → inverse-retraction (P≃P' .snd) (h c s) r)
 
-  cocone-preserves-≃ : P -cocone ≃ P' -cocone
-  cocone-preserves-≃ = to , gradLemma _ from tofrom∼id fromto∼id
+  cocone-preserves-≃₁ : P -cocone ≃ P' -cocone
+  cocone-preserves-≃₁ = to , gradLemma _ from tofrom∼id fromto∼id
+
+module _ {ℓ} {A B C C' P : Set ℓ} {f : C → A} {g : C → B} (C'≃C : C' ≃ C) (let open PO.Cocone) (c : _-cocone f g P) where
+  private
+    m   = C'≃C .fst
+    m⁻¹ = inverse C'≃C
+    open _-cocone c using (i; j; h)
+
+  module _ where
+    cocone-preserves-≃₂ : ∀ E → _-cocone f g E ≃ _-cocone (f ∘ m) (g ∘ m) E
+    cocone-preserves-≃₂ E =   _-cocone f g E
+                            ≃⟨ cocone-Σ-equiv f g E ⟩
+                              _
+                            ≃⟨ _ , totalEquiv _ _ _ (λ i → totalEquiv _ _ _ (λ j → pre-equiv-d m (C'≃C .snd))) ⟩
+                              _
+                            ≃⟨ inverseEquiv (cocone-Σ-equiv (f ∘ m) (g ∘ m) E) ⟩
+                             _-cocone (f ∘ m) (g ∘ m) E □
+
+  private
+    module _ where
+      c' : _-cocone (f ∘ m) (g ∘ m) P
+      c' = cocone i j (right-whisker m h)
+
+    open PO hiding (P)
+
+  isPushOut-preserves-≃ : isPushOut c ≃ isPushOut c'
+  isPushOut-preserves-≃ = _ , lem492-d λ E → compEquiv-r _ _ (cocone-preserves-≃₂ E .snd)
 
 module _ {ℓ} {A B C P : Set ℓ} {f : C → A} {g : C → B} {i : A → P} {j : B → P} {H : Homotopy (i ∘ f) (j ∘ g)} where
   open PO.Cocone f g
