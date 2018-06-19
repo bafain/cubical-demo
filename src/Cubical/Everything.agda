@@ -28,6 +28,7 @@ open import Cubical.PullBack.Properties
 open import Cubical.PushOut
 open import Cubical.PushOut.Properties
 open import Cubical.Join
+open import Cubical.Join.Properties
 open import Cubical.Equivalence.Properties
 open import Cubical.Equivalence.HAE
 open import Cubical.Equivalence.Embedding
