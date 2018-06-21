@@ -121,6 +121,10 @@ module _ {ℓa : _} {A : Set ℓa} {x y : A} where
   sym-equiv : isEquiv (x ≡ y) (y ≡ x) sym
   sym-equiv = λ q → (sym q , refl) , λ { (p , q≡p⁻¹) i → sym (q≡p⁻¹ i) , λ j → q≡p⁻¹ (i ∧ j) }
 
+module _ {ℓa ℓb : _} {A : Set ℓa} {B : Set ℓb} {f g : A → B} where
+  hinv-equiv : isEquiv (Homotopy f g) (Homotopy g f) hinv
+  hinv-equiv = λ h → (hinv h , refl) , λ { (h' , h≡h'⁻¹) i → hinv (h≡h'⁻¹ i) , λ j → h≡h'⁻¹ (i ∧ j) }
+
 module _ {ℓa ℓb ℓr : _} {A : Set ℓa} {B : A → Set ℓb} {R : (a : A) → B a → Set ℓr} where
   ac : (∀ x → Σ (B x) λ y → R x y) → Σ ((x : A) → B x) λ f → ∀ x → R x (f x)
   ac g = fst ∘ g , snd ∘ g
