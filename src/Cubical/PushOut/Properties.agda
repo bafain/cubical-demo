@@ -9,6 +9,8 @@ open import Cubical.Fiberwise
 open import Cubical.GradLemma
 open import Cubical.Lemmas
 open import Cubical.NType.Properties
+open import Cubical.PullBack as PB
+import Cubical.PullBack.Properties as PBP
 open import Cubical.PushOut as PO
 
 -- Proposition 1.8.4 in Brunerie
@@ -117,3 +119,31 @@ module _ {ℓ} {A B C P : Set ℓ} {f : C → A} {g : C → B} {i : A → P} {j 
 
     unique : isPushOut c ≃ isEquiv _ _ [i,j]
     unique = _ , lem3-3-3 (propIsPushOut c) (propIsEquiv _) to from
+
+  module _ where
+    private
+      module _ (P' : Set ℓ) where
+        open PB.Cone {C = C → P'} (_∘ f) (_∘ g)
+        open PB.Canonical {C = C → P'} (_∘ f) (_∘ g)
+
+        cocone-Σ-equiv′ : P' -cocone ≃ PullBack (_∘ f) (_∘ g)
+        cocone-Σ-equiv′ =   P' -cocone
+                          ≃⟨ cocone-Σ-equiv P' ⟩
+                            (Σ (A → P') λ i → Σ (B → P') λ j → Homotopy (i ∘ f) (j ∘ g))
+                          ≃⟨ _ , totalEquiv _ _ _ (λ i → totalEquiv _ _ _ (λ j → inverseEquiv FUNEXT .snd)) ⟩
+                            (Σ (A → P') λ i → Σ (B → P') λ j → i ∘ f ≡ j ∘ g) □
+
+        c' : (P → P') -cone
+        c' = cone (_∘ i) (_∘ j) (funExt ∘ flip left-whisker H)
+
+        open PBP renaming (unique to pb-unique)
+
+        h : isPullBack c' ≃ isEquiv _ _ (toCocone c)
+        h =   isPullBack c'
+            ≃⟨ pb-unique c' ⟩
+              isEquiv _ _ ⟨ _∘ i , _∘ j , funExt ∘ flip left-whisker H ⟩
+            ≃⟨ inverseEquiv (compEquiv-r _ _ (cocone-Σ-equiv′ .snd)) ⟩
+              isEquiv _ _ (toCocone c) □
+
+    prop : (∀ P' → isPullBack (c' P')) ≃ isPushOut c
+    prop = _ , lem492-d h
