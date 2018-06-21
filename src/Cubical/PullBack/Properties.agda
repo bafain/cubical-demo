@@ -101,6 +101,25 @@ module _ {ℓ} {A B D C C' : Set ℓ} (f : A → D) (g : B → D) (C≃C' : C �
   cone-preserves-≃ : C -cone ≃ C' -cone
   cone-preserves-≃ = to , gradLemma _ from tofrom∼id fromto∼id
 
+module _ {ℓ} {A B D : Set ℓ} {f : A → D} {g : B → D} where
+  open PB.Cone
+
+  module _ {C : Set ℓ} where
+    cone-comm : _-cone f g C ≃ _-cone g f C
+    cone-comm = _-cone f g C
+                ≃⟨ cone-Σ-equiv C ⟩
+                  Σ (C → A) (λ p₁ → Σ (C → B) λ p₂ → Homotopy (f ∘ p₁) (g ∘ p₂))
+                ≃⟨ Σ-swap ⟩
+                  Σ (C → B) (λ p₁ → Σ (C → A) λ p₂ → Homotopy (f ∘ p₂) (g ∘ p₁))
+                ≃⟨ _ , totalEquiv _ _ _ (λ p₁ → totalEquiv _ _ _ (λ p₂ → hinv-equiv)) ⟩
+                  Σ (C → B) (λ p₁ → Σ (C → A) λ p₂ → Homotopy (g ∘ p₁) (f ∘ p₂))
+                ≃⟨ inverseEquiv (cone-Σ-equiv C) ⟩
+                  _-cone g f C □
+
+  module _ {C : Set ℓ} (c : _-cone f g C) where
+    isPullBack-comm : isPullBack c ≃ isPullBack (cone-comm .fst c)
+    isPullBack-comm = _ , lem492-d λ T → compEquiv-r _ _ (cone-comm .snd)
+
 module _ {A B C D : Set ℓ} {f : A → D} {g : B → D} (let open PB.Cone f g) (c : C -cone) (equivf : isEquiv _ _ f) where
   open _-cone c
 
