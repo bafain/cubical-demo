@@ -12,6 +12,7 @@ open import Cubical.NType
 open import Cubical.NType.Properties
 open import Cubical.Pi
 open import Cubical.PullBack as PB
+open import Cubical.Sigma          using (Σ-swap)
 
 private
   module _ {A B C D : Set ℓ}
@@ -56,6 +57,21 @@ module _ {A B C D : Set ℓ}
       from : (∀ a → isEquiv _ _ (Q H a)) → isPullBack c
       from equivQ = inverse unique (∼-preserves-isEquiv H' .fst (compEquiv (lem4-8-2 p) (_ , totalEquiv _ _ _ equivQ) .snd))
 
+  module _ (equivg : isEquiv _ _ g) where
+    private
+      to : (∀ a → isEquiv _ _ (Q H a)) → isEquiv _ _ p
+      to   equivQ a = equivPreservesNType {n = ⟨-2⟩} (inverseEquiv (_ , equivQ a)) (equivg (f a))
+
+      from : isEquiv _ _ p → (∀ a → isEquiv _ _ (Q H a))
+      from equivp a = contrEquiv (equivp a) (equivg (f a))
+
+    preserves-isEquiv₁ : isPullBack c ≃ isEquiv _ _ p
+    preserves-isEquiv₁ =   isPullBack c
+                         ≃⟨ lem7-6-8 ⟩
+                           (∀ a → isEquiv _ _ (Q H a))
+                         ≃⟨ to , lem3-3-3 (piPresNType ⟨-1⟩ λ a → propIsEquiv (Q H a)) (propIsEquiv p) to from ⟩
+                           isEquiv _ _ p □
+
 module _ {ℓ} {A B D C C' : Set ℓ} (f : A → D) (g : B → D) (C≃C' : C ≃ C') where
   open PB.Cone f g
 
@@ -84,6 +100,19 @@ module _ {ℓ} {A B D C C' : Set ℓ} (f : A → D) (g : B → D) (C≃C' : C �
 
   cone-preserves-≃ : C -cone ≃ C' -cone
   cone-preserves-≃ = to , gradLemma _ from tofrom∼id fromto∼id
+
+module _ {A B C D : Set ℓ} {f : A → D} {g : B → D} (let open PB.Cone f g) (c : C -cone) (equivf : isEquiv _ _ f) where
+  open _-cone c
+
+  private
+    c' = cone-comm .fst c
+
+  preserves-isEquiv₂ : isPullBack c ≃ isEquiv _ _ p₂
+  preserves-isEquiv₂ =   isPullBack c
+                       ≃⟨ isPullBack-comm c ⟩
+                         isPullBack c'
+                       ≃⟨ preserves-isEquiv₁ c' equivf ⟩
+                         isEquiv _ _ p₂ □
 
 -- Exercise 2.12
 module _ {A B C D B' D' : Set ℓ}
