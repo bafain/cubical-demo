@@ -153,3 +153,16 @@ module _ {A B C D B' D' : Set ℓ}
             (∀ a → isEquiv (fiber p a) (fiber g' (f' (f a))) (Q H'∘H a))
           ≃⟨ inverseEquiv (lem7-6-8 left∘right) ⟩
             isPullBack left∘right □
+
+module _ {A B : Set ℓ} where
+  open PB.Cone (⊤-intro {A = A}) (⊤-intro {A = B})
+
+  private
+    c : (A × B) -cone
+    c = cone fst snd hid
+
+    from : PullBack (⊤-intro {A = A}) (⊤-intro {A = B}) → A × B
+    from (a , b , _) = a , b
+
+  ×-pullback : Σ ((A × B) -cone) λ c → isPullBack c
+  ×-pullback = c , inverse (unique c) λ x → (from x , refl) , λ { (y , x≡y) i → from (x≡y i) , λ j → x≡y (i ∧ j) }
