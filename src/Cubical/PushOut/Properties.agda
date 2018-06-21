@@ -71,6 +71,25 @@ module _ {ℓ} {A B C P P' : Set ℓ} (f : C → A) (g : C → B) (P≃P' : P �
   cocone-preserves-≃₁ : P -cocone ≃ P' -cocone
   cocone-preserves-≃₁ = to , gradLemma _ from tofrom∼id fromto∼id
 
+module _ {ℓ} {A B C : Set ℓ} {f : C → A} {g : C → B} where
+  open PO.Cocone
+
+  module _ {P : Set ℓ} where
+    cocone-comm : _-cocone f g P ≃ _-cocone g f P
+    cocone-comm = _-cocone f g P
+                ≃⟨ cocone-Σ-equiv f g P ⟩
+                  Σ (A → P) (λ i → Σ (B → P) λ j → Homotopy (i ∘ f) (j ∘ g))
+                ≃⟨ Σ-swap ⟩
+                  Σ (B → P) (λ i → Σ (A → P) λ j → Homotopy (j ∘ f) (i ∘ g))
+                ≃⟨ _ , totalEquiv _ _ _ (λ i → totalEquiv _ _ _ (λ j → hinv-equiv)) ⟩
+                  Σ (B → P) (λ i → Σ (A → P) λ j → Homotopy (i ∘ g) (j ∘ f))
+                ≃⟨ inverseEquiv (cocone-Σ-equiv g f P) ⟩
+                  _-cocone g f P □
+
+  module _ {P : Set ℓ} {c : _-cocone f g P} where
+    isPushOut-comm : isPushOut c ≃ isPushOut (cocone-comm .fst c)
+    isPushOut-comm = _ , lem492-d λ E → compEquiv-r _ _ (cocone-comm .snd)
+
 module _ {ℓ} {A B C C' P : Set ℓ} {f : C → A} {g : C → B} (C'≃C : C' ≃ C) (let open PO.Cocone) (c : _-cocone f g P) where
   private
     m   = C'≃C .fst
