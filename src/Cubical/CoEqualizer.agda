@@ -134,5 +134,5 @@ module TheCoEq {l} (A B : Set l) (f g : A → B) where
                                    ([h] b)
        coeq-elim-path' b = cancel C (sym (push' (left b))) (push' (right b)) _ ([h] b)
 
-     coeq-elim-path : ∀ b → PathP (\ i → PathP (\ i → C (coeq-path b i)) (h (f b)) (h (g b))) (\ i → coeq-elim (coeq-path b i)) ([h] b)
+     coeq-elim-path : ∀ b → cong-d coeq-elim (coeq-path b) ≡ [h] b
      coeq-elim-path b = coeq-elim-path' b
